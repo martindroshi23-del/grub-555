@@ -108,6 +108,26 @@ window.copiarPedidoTexto = (idVenta) => {
         });
     }
 
+    window.guardarConfigWhatsApp = async () => {
+        let wpVal = document.getElementById("config-whatsapp-number").value.trim();
+        try {
+            await setDoc(doc(db, "config", "whatsapp"), { numero: wpVal });
+            if (typeof window.mostrarBurbuja === 'function') window.mostrarBurbuja("Número de WhatsApp guardado");
+        } catch(e) {
+            console.error(e);
+            if (typeof window.mostrarBurbuja === 'function') window.mostrarBurbuja("Error al guardar número de WhatsApp", true);
+        }
+    };
+
+    function cargarConfigWhatsApp() {
+        onSnapshot(doc(db, "config", "whatsapp"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().numero) {
+                document.getElementById("config-whatsapp-number").value = docSnap.data().numero;
+                window.configuracionWhatsApp = docSnap.data().numero;
+            }
+        });
+    }
+
     window.aplicarInterfazPorRol = () => {
         const btnsSidebar = document.querySelectorAll('.sidebar-btn');
 
@@ -126,10 +146,10 @@ window.copiarPedidoTexto = (idVenta) => {
             document.getElementById('main-sidebar').style.display = 'flex';
             cocinaScreen.style.display = 'none';
 
-        // Hide Inventario, Editar Menú and Usuarios
+        // Hide Inventario, Editar Menú, Usuarios and Configuraciones
             btnsSidebar.forEach((btn, index) => {
                 const tooltip = btn.getAttribute('data-tooltip');
-            if (tooltip === "Inventario Nube" || tooltip === "Editar Menú" || tooltip === "Gestionar Usuarios") {
+            if (tooltip === "Inventario Nube" || tooltip === "Editar Menú" || tooltip === "Gestionar Usuarios" || tooltip === "Configuraciones") {
                     btn.style.display = 'none';
                 } else {
                     btn.style.display = 'flex';
@@ -227,6 +247,7 @@ window.copiarPedidoTexto = (idVenta) => {
               renderEditor();
           }
       });
+      cargarConfigWhatsApp();
       onSnapshot(collection(db, "productos"), (snapshot) => {
         window.productosNube = [];
         snapshot.forEach((docSnap) => {
@@ -384,11 +405,15 @@ window.copiarPedidoTexto = (idVenta) => {
               <div style="margin-bottom:6px;">${btnDetalle} ${costoEnvioHtml}</div>
               ${accionesHtml}
             </td>
-            <td style="text-align:center;">
-              ${v.estado === 'Pendiente' ? `<button class="btn-estado pendiente" onclick="marcarVentaLista('${v.id}')">Marcar Listo</button>` : ''}
-              ${v.estado === 'Listo' ? `<button class="btn-estado listo" style="margin-bottom: 5px;">Completado</button>` : ''}
-              ${v.estado !== 'Cancelado' && !v.pagado ? `<br><button class="btn-estado" style="background: none; border: 1px solid #00c853; color: #00c853;" onclick="marcarVentaPagada('${v.id}')">Marcar como Pagado</button>` : ''}
-              ${v.estado === 'Cancelado' ? `<span style="color:#ff3c3c; font-weight:bold; font-size:0.8rem;">Cancelado</span>` : ''}
+            <td style="text-align:center; padding: 5px;">
+              <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center; height: 100%;">
+                ${v.estado === 'Pendiente' ? `<button class="btn-estado pendiente" onclick="toggleVentaLista('${v.id}', true)">Marcar Listo</button>` : ''}
+                ${v.estado === 'Listo' ? `<button class="btn-estado listo" onclick="toggleVentaLista('${v.id}', false)">Completado</button>` : ''}
+
+                ${v.estado !== 'Cancelado' ? (!v.pagado ? `<button class="btn-estado pendiente" onclick="toggleVentaPagada('${v.id}', true)">Marcar Pagado</button>` : `<button class="btn-estado listo" onclick="toggleVentaPagada('${v.id}', false)">Pagado</button>`) : ''}
+
+                ${v.estado === 'Cancelado' ? `<span style="color:#ff3c3c; font-weight:bold; font-size:0.8rem;">Cancelado</span>` : ''}
+              </div>
             </td>
           </tr>`;
         });
@@ -938,9 +963,19 @@ window.copiarPedidoTexto = (idVenta) => {
         await updateDoc(doc(db, "ventas", idVenta), {estado: "Listo", fechaListo: new Date().toISOString()});
     };
 
+    window.toggleVentaLista = async (idVenta, esListo) => {
+        let updateData = esListo ? {estado: "Listo", fechaListo: new Date().toISOString()} : {estado: "Pendiente"};
+        await updateDoc(doc(db, "ventas", idVenta), updateData);
+    };
+
     window.marcarVentaPagada = async (idVenta) => {
         await updateDoc(doc(db, "ventas", idVenta), {pagado: true});
         window.mostrarBurbuja("Pedido marcado como pagado");
+    };
+
+    window.toggleVentaPagada = async (idVenta, esPagado) => {
+        await updateDoc(doc(db, "ventas", idVenta), {pagado: esPagado});
+        window.mostrarBurbuja(esPagado ? "Pedido marcado como pagado" : "Pedido desmarcado como pagado");
     };
 
     let ventaTempCancel = null;
@@ -1139,18 +1174,23 @@ window.imprimirTicketLocal = (idVenta) => {
     if (v.detalle && Array.isArray(v.detalle)) {
         v.detalle.forEach(d => {
             let nombreCompleto = d.nombreBase || '';
+            let extraInfo = [];
             if (d.desglose) {
-                // If there are options, append them to the name
-                let opciones = Object.values(d.desglose).join(', ');
-                if (opciones) {
-                    nombreCompleto += ` (${opciones})`;
+                for (let key in d.desglose) {
+                    let val = d.desglose[key];
+                    if (key === 'A quitar' || key === 'Sin') {
+                        extraInfo.push(`- ${val}`);
+                    } else {
+                        extraInfo.push(`+ ${val}`);
+                    }
                 }
             }
 
             productos.push({
                 "Cantidad": d.cantidad || 1,
                 "Nombre": nombreCompleto,
-                "Precio": Number(d.precio) || 0
+                "ExtraInfo": extraInfo,
+                "Precio": Number(d.precioFinal * d.cantidad) || Number(d.precio * d.cantidad) || 0
             });
         });
     }
@@ -1162,7 +1202,8 @@ window.imprimirTicketLocal = (idVenta) => {
         "Fecha": fechaFormateada,
         "Cliente": v.cliente || "Mostrador",
         "Productos": productos,
-        "Total": Number(v.total) || 0
+        "Total": Number(v.total) || 0,
+        "Envio": Number(v.envio) || 0
     };
 
     // Mostrar el modal
@@ -1347,10 +1388,21 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
                     let spaces = 32 - line.length - String(p.Precio).length - 1;
                     if (spaces < 1) spaces = 1;
                     buffer.push(textToEscPos(line + ' '.repeat(spaces) + '$' + p.Precio));
+                    if (p.ExtraInfo && p.ExtraInfo.length > 0) {
+                        p.ExtraInfo.forEach(info => {
+                            let infoLine = `  ${info}`;
+                            if (infoLine.length > 32) infoLine = infoLine.substring(0, 32);
+                            buffer.push(textToEscPos(infoLine));
+                        });
+                    }
                 });
             }
 
             buffer.push(textToEscPos('--------------------------------'));
+            buffer.push(LEFT);
+            if (window._payloadImpresionActual.Envio) {
+                buffer.push(textToEscPos(`Envio: $${window._payloadImpresionActual.Envio}`));
+            }
             buffer.push(CENTER);
             buffer.push(BOLD_ON);
             buffer.push(textToEscPos(`TOTAL: $${window._payloadImpresionActual.Total}`));

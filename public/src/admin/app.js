@@ -13,7 +13,7 @@ window.ingresar = ingresar;
 window.cerrarSesion = cerrarSesion;
 
 window.cambiarTab = (idTab, btnEl) => { 
-  if (window.rolActual === 'cajero' && (idTab === 'tab-inventario' || idTab === 'tab-editor-menu' || idTab === 'tab-usuarios')) {
+  if (window.rolActual === 'cajero' && (idTab === 'tab-inventario' || idTab === 'tab-editor-menu' || idTab === 'tab-usuarios' || idTab === 'tab-config')) {
     return;
   }
 
@@ -67,10 +67,10 @@ window.aplicarInterfazPorRol = () => {
         document.getElementById('main-sidebar').style.display = 'flex';
         cocinaScreen.style.display = 'none';
 
-        // Hide Inventario, Editar Menú and Usuarios
+        // Hide Inventario, Editar Menú, Usuarios and Configuraciones
         btnsSidebar.forEach((btn, index) => {
             const tooltip = btn.getAttribute('data-tooltip');
-            if (tooltip === "Inventario Nube" || tooltip === "Editar Menú" || tooltip === "Gestionar Usuarios") {
+            if (tooltip === "Inventario Nube" || tooltip === "Editar Menú" || tooltip === "Gestionar Usuarios" || tooltip === "Configuraciones") {
                 btn.style.display = 'none';
             } else {
                 btn.style.display = 'flex';

@@ -85,7 +85,8 @@ window.enviarPedido = async (event) => {
   }).join("\n\n");
 
   let msg = `¡Hola Grub! Quiero hacer el siguiente pedido:\n\n${detalle}\n\n*TOTAL: $${total}*\n\nNombre: ${nombre}\nDirección: ${dir}`;
-  window.open("https://wa.me/5493813457043?text=" + encodeURIComponent(msg)); 
+  let numWa = window.configuracionWhatsAppCliente || "5493813457043";
+  window.open(`https://wa.me/${numWa}?text=` + encodeURIComponent(msg));
   
   vaciarCarrito();
   actualizarBotonFlotante(); 

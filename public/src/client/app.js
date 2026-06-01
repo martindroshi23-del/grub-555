@@ -16,9 +16,17 @@ window.cerrarModal = (id) => {
 let productos = [];
 let layoutConfig = null;
 let currentViewport = 'mobile';
+window.configuracionWhatsAppCliente = "5493813457043"; // Default
 
 // Registrar visita global de la página
 setDoc(doc(db, "stats", "general"), { vistasTotales: increment(1) }, { merge: true }).catch(e => console.log(e));
+
+// Cargar config whatsapp
+onSnapshot(doc(db, "config", "whatsapp"), (docSnap) => {
+    if (docSnap.exists() && docSnap.data().numero) {
+        window.configuracionWhatsAppCliente = docSnap.data().numero;
+    }
+});
 
 function updateViewportInfo() {
     let width = window.innerWidth;
