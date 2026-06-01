@@ -5,6 +5,7 @@ import "./pd.js";
 import "./ui.js";
 import "./editor.js";
 import "./kds.js";
+import "./ticket_sim.js";
 
 import { iniciarEscuchaAuth, ingresar, cerrarSesion } from "../services/auth.service.js";
 
