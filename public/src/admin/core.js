@@ -386,7 +386,8 @@ window.copiarPedidoTexto = (idVenta) => {
             </td>
             <td style="text-align:center;">
               ${v.estado === 'Pendiente' ? `<button class="btn-estado pendiente" onclick="marcarVentaLista('${v.id}')">Marcar Listo</button>` : ''}
-              ${v.estado === 'Listo' ? `<button class="btn-estado listo">Completado</button>` : ''}
+              ${v.estado === 'Listo' ? `<button class="btn-estado listo" style="margin-bottom: 5px;">Completado</button>` : ''}
+              ${v.estado !== 'Cancelado' && !v.pagado ? `<br><button class="btn-estado" style="background: none; border: 1px solid #00c853; color: #00c853;" onclick="marcarVentaPagada('${v.id}')">Marcar como Pagado</button>` : ''}
               ${v.estado === 'Cancelado' ? `<span style="color:#ff3c3c; font-weight:bold; font-size:0.8rem;">Cancelado</span>` : ''}
             </td>
           </tr>`;
@@ -471,6 +472,7 @@ window.copiarPedidoTexto = (idVenta) => {
       document.getElementById("vTotalManual").value = "";
       document.getElementById("vDetalles").value = "";
       document.getElementById("vEstado").value = "Pendiente";
+      document.getElementById("vPagado").value = "false";
       document.getElementById("vMetodoPago").value = "Efectivo";
       toggleMitadPago();
 
@@ -513,6 +515,7 @@ window.copiarPedidoTexto = (idVenta) => {
       }
 
       document.getElementById("vEstado").value = v.estado || "Pendiente";
+      document.getElementById("vPagado").value = v.pagado ? "true" : "false";
       document.getElementById("vDetalles").value = v.notas || "";
 
       itemsVentaTemp = JSON.parse(JSON.stringify(v.detalle || []));
@@ -809,6 +812,7 @@ window.copiarPedidoTexto = (idVenta) => {
       let maxOrden = window.ventasGlobales.reduce((max, v) => Math.max(max, v.numeroOrden || 0), 0);
       let numOrdenAsignado = idEdicion ? (window.ventasGlobales.find(v=>v.id === idEdicion).numeroOrden) : (maxOrden + 1);
       let estadoNuevo = document.getElementById("vEstado").value;
+      let pagadoVal = document.getElementById("vPagado").value === "true";
 
       let ventaInfo = {
         numeroOrden: numOrdenAsignado,
@@ -821,6 +825,7 @@ window.copiarPedidoTexto = (idVenta) => {
         montoEfectivo: mEf,
         montoTransferencia: mTr,
         estado: estadoNuevo,
+        pagado: pagadoVal,
         notas: document.getElementById("vDetalles").value.trim(),
         detalle: itemsVentaTemp
       };
@@ -931,6 +936,11 @@ window.copiarPedidoTexto = (idVenta) => {
 
     window.marcarVentaLista = async (idVenta) => {
         await updateDoc(doc(db, "ventas", idVenta), {estado: "Listo", fechaListo: new Date().toISOString()});
+    };
+
+    window.marcarVentaPagada = async (idVenta) => {
+        await updateDoc(doc(db, "ventas", idVenta), {pagado: true});
+        window.mostrarBurbuja("Pedido marcado como pagado");
     };
 
     let ventaTempCancel = null;

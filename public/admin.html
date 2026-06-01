@@ -640,7 +640,7 @@
               <input type="hidden" id="vEditVentaId" />
 
               <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+                style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px"
               >
                 <div>
                   <label class="input-label">Cliente</label
@@ -823,7 +823,14 @@
                   </select>
                 </div>
                 <div>
-                  <label class="input-label">Estado</label>
+                  <label class="input-label">Estado Pago</label>
+                  <select id="vPagado" style="padding: 10px">
+                    <option value="false">Pendiente de Pago</option>
+                    <option value="true">Ya Pagado</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="input-label">Estado Preparación</label>
                   <select id="vEstado" style="padding: 10px">
                     <option value="Pendiente">Pendiente</option>
                     <option value="Listo">Listo</option>
@@ -1313,31 +1320,49 @@
         </div>
       </div>
 
-      <div id="tab-editor-menu" class="tab-content">
-        <div
-          class="admin-card"
-          style="
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 40px);
-          "
-        >
-          <h3 style="color: var(--primary); margin-bottom: 15px">
-            🎨 Editar Menú Visual
-          </h3>
+      <div id="tab-editor-menu" class="tab-content" style="padding: 0;">
+        <div style="display: flex; height: 100vh;">
+          <!-- Sidebar Editor Menú -->
+          <aside style="width: 250px; background: #161616; border-right: 1px solid #2a2a2a; display: flex; flex-direction: column; padding: 20px;">
+            <h3 style="color: var(--primary); margin-bottom: 20px; font-size: 1.2rem;">🎨 Diseño y Menú</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="sidebar-btn-editor active" onclick="switchEditorTab('menu-digital')" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: none; border: none; color: white; cursor: pointer; border-radius: 8px; text-align: left; transition: 0.3s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Menú Digital
+              </button>
+              <button class="sidebar-btn-editor" onclick="switchEditorTab('diseno-ticket')" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: none; border: none; color: #777; cursor: pointer; border-radius: 8px; text-align: left; transition: 0.3s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"></path><path d="M16 16H8"></path><path d="M16 12H8"></path><path d="M10 8H8"></path></svg>
+                Diseño de Ticket
+              </button>
+            </div>
+          </aside>
 
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 15px;
-              align-items: center;
-              flex-wrap: wrap;
-              gap: 10px;
-            "
-          >
+          <!-- Main Content Editor -->
+          <div style="flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto;" id="editor-main-content">
+
+            <!-- Tab: Menú Digital -->
+            <div id="tab-menu-digital" style="display: flex; flex-direction: column; height: 100%;">
+              <div
+                class="admin-card"
+                style="
+                  max-width: 1000px;
+                  margin: 0 auto;
+                  display: flex;
+                  flex-direction: column;
+                  height: 100%;
+                  width: 100%;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                  "
+                >
             <div style="display: flex; gap: 10px">
               <button
                 class="btn-primary"
@@ -1471,6 +1496,78 @@
             >
               <!-- Productos ocultos aqui -->
             </div>
+          </div>
+              </div>
+            </div>
+
+            <!-- Tab: Diseño de Ticket (Simulador) -->
+            <div id="tab-diseno-ticket" style="display: none; flex-direction: column; height: 100%;">
+              <div class="admin-card" style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; width: 100%;">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">🧾 Diseño de Ticket (Simulador)</h3>
+
+                <div style="flex-grow: 1; overflow-y: auto; background: #111; border-radius: 10px; border: 1px solid #333; padding: 15px; display: flex; justify-content: center; align-items: flex-start;">
+
+                  <!-- Ticket Render Container -->
+                  <div id="ticket-preview-container" style="
+                    background: #fff;
+                    width: 100%;
+                    max-width: 320px;
+                    padding: 15px;
+                    color: #000;
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 14px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                    border: 1px solid #ddd;
+                  ">
+                    <!-- Cabecera -->
+                    <div style="text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+                      <h2 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 2px;">GRUB</h2>
+                    </div>
+
+                    <!-- Bloque Cliente -->
+                    <div id="ticket-cliente-info" style="margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; line-height: 1.4;">
+                      <div id="ticket-cliente-nombre"><strong>Cliente:</strong> -</div>
+                      <div id="ticket-cliente-tel"><strong>Tel:</strong> -</div>
+                      <div id="ticket-cliente-dir"><strong>Dir:</strong> -</div>
+                    </div>
+
+                    <!-- Cuerpo (Productos) -->
+                    <div id="ticket-productos-list" style="margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+                      <!-- Productos se renderizarán aquí -->
+                    </div>
+
+                    <!-- Bebidas -->
+                    <div id="ticket-bebidas-list" style="margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+                      <!-- Bebidas se renderizarán aquí -->
+                    </div>
+
+                    <!-- Costos Finales -->
+                    <div style="margin-bottom: 15px;">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Costo de Envío:</span>
+                        <span id="ticket-costo-envio">$0.00</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 5px;">
+                        <span>TOTAL:</span>
+                        <span id="ticket-total">$0.00</span>
+                      </div>
+                    </div>
+
+                    <!-- Estado Pago -->
+                    <div id="ticket-estado-pago" style="text-align: center; font-size: 18px; font-weight: bold; padding: 5px; margin-bottom: 15px; border: 2px solid #000;">
+                      NO PAGADO
+                    </div>
+
+                    <!-- Pie de página -->
+                    <div style="text-align: center; font-size: 10px; color: #555;">
+                      Documento no válido como factura
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
