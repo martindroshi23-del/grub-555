@@ -1,0 +1,1768 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grub - Sistema de Administración</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+  <body>
+    <div id="login-screen">
+      <div class="login-box">
+        <div class="sidebar-logo" style="margin: 0 auto 20px auto">G</div>
+        <h1 style="color: var(--primary); margin-bottom: 10px">
+          🔐 Grub Admin
+        </h1>
+        <p style="color: var(--text-light); margin-bottom: 25px">
+          Estación de Control
+        </p>
+        <input type="email" id="email" placeholder="Correo electrónico" />
+        <input type="password" id="password" placeholder="Contraseña" />
+        <button class="btn-primary" onclick="ingresar()">
+          Entrar al Sistema
+        </button>
+        <p
+          id="login-error"
+          style="
+            color: #ff3c3c;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+          "
+        >
+          Datos incorrectos.
+        </p>
+      </div>
+    </div>
+
+    <aside class="sidebar" id="main-sidebar" style="display: none">
+      <div class="sidebar-logo">G</div>
+
+      <button
+        class="sidebar-btn active"
+        data-tooltip="Ventas en Vivo"
+        onclick="cambiarTab('tab-ventas', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.2 9.3a1 1 0 001 .7h10.4a1 1 0 001-.7L17 13"
+          ></path>
+        </svg>
+      </button>
+
+      <button
+        class="sidebar-btn"
+        data-tooltip="Inventario Nube"
+        onclick="cambiarTab('tab-inventario', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+          ></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+      </button>
+
+      <button
+        class="sidebar-btn"
+        data-tooltip="Programa Descuentos"
+        onclick="cambiarTab('tab-pd', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <polyline points="20 12 20 22 4 22 4 12"></polyline>
+          <rect x="2" y="7" width="20" height="5"></rect>
+          <line x1="12" y1="22" x2="12" y2="7"></line>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+        </svg>
+      </button>
+
+      <button
+        class="sidebar-btn"
+        data-tooltip="Editar Menú"
+        onclick="cambiarTab('tab-editor-menu', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+          ></path>
+          <path
+            d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+          ></path>
+        </svg>
+      </button>
+
+      <button
+        class="sidebar-btn"
+        data-tooltip="Gestionar Usuarios"
+        onclick="cambiarTab('tab-usuarios', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </button>
+
+      <div style="flex-grow: 1"></div>
+
+      <button
+        class="sidebar-btn"
+        data-tooltip="Salir"
+        onclick="cerrarSesion()"
+        style="margin-bottom: 20px"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </aside>
+
+    <div id="cocina-screen" style="display: none">
+      <div class="kds-header">
+        <div class="kds-title">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--primary)"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+            />
+          </svg>
+          <span>Monitor de Cocina (KDS)</span>
+        </div>
+
+        <div class="kds-view-switcher">
+          <button
+            class="kds-view-btn"
+            data-view="mobile"
+            onclick="setKdsView('mobile')"
+            title="Vista Celular"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </button>
+          <button
+            class="kds-view-btn active"
+            data-view="tablet"
+            onclick="setKdsView('tablet')"
+            title="Vista Tablet"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </button>
+          <button
+            class="kds-view-btn"
+            data-view="pc"
+            onclick="setKdsView('pc')"
+            title="Vista PC"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </button>
+        </div>
+
+        <button onclick="cerrarSesion()" class="kds-logout-btn">
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Salir
+        </button>
+      </div>
+
+      <div id="kds-container" class="kds-grid view-tablet">
+        <!-- Cards will be injected here via JS -->
+      </div>
+    </div>
+
+    <div id="admin-screen">
+      <div id="tab-ventas" class="tab-content active">
+        <div class="layout-ventas">
+          <div class="panel-izquierdo">
+            <div class="historial-header">
+              <h2>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                  ></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Historial de Pedidos
+              </h2>
+              <div class="acciones-historial">
+                <button
+                  class="btn-header-mini nuevo"
+                  onclick="abrirRegistroNuevo()"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Nuevo
+                </button>
+                <button
+                  class="btn-header-mini excel"
+                  onclick="exportarHistorialCaja()"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                  Caja
+                </button>
+                <button
+                  class="btn-header-mini borrar"
+                  onclick="borrarHistorial()"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path>
+                  </svg>
+                  Nube
+                </button>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                margin-bottom: 12px;
+                background: #111;
+                padding: 8px;
+                border-radius: 8px;
+              "
+            >
+              <input
+                type="text"
+                id="filtroBuscadorHistorial"
+                placeholder="Buscar cliente o N° Orden..."
+                style="
+                  margin-bottom: 0;
+                  flex-grow: 1;
+                  padding: 10px;
+                  border: none;
+                "
+                onkeyup="renderizarTablaVentas()"
+              />
+              <select
+                id="filtroVistaOrden"
+                style="
+                  margin-bottom: 0;
+                  width: auto;
+                  padding: 10px;
+                  border: none;
+                "
+                onchange="renderizarTablaVentas()"
+              >
+                <option value="recientes">Todos (Recientes)</option>
+                <option value="pendientes_primero">Pendientes Primero</option>
+                <option value="completados">Solo Completados</option>
+              </select>
+            </div>
+
+            <div class="tabla-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 20%">Orden / Tiempo</th>
+                    <th>Cliente / Contacto</th>
+                    <th>Detalle</th>
+                    <th style="width: 100px">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-ventas">
+                  <tr>
+                    <td colspan="4" style="text-align: center">
+                      Cargando historial...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel-derecho">
+            <div
+              id="vistaDashboards"
+              style="display: flex; flex-direction: column; height: 100%"
+            >
+              <div class="tabs-dash">
+                <button
+                  class="tab-btn-dash active"
+                  id="btnDashPend"
+                  onclick="cambiarDash('pendientes')"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: text-bottom"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Pedidos Activos
+                </button>
+                <button
+                  class="tab-btn-dash"
+                  id="btnDashStock"
+                  onclick="cambiarDash('stock')"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: text-bottom"
+                  >
+                    <line x1="16.5" y1="9.4" x2="7.5" y2="4.2"></line>
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                    ></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  Vista de Stock
+                </button>
+                <button
+                  class="tab-btn-dash"
+                  id="btnDashMovimientos"
+                  onclick="cambiarDash('movimientos')"
+                >
+                  Movimientos
+                </button>
+                <button
+                  class="tab-btn-dash"
+                  id="btnDashGastos"
+                  onclick="cambiarDash('gastos')"
+                >
+                  Gastos
+                </button>
+              </div>
+
+              <div id="dash-pendientes" style="flex-grow: 1; overflow-y: auto">
+                <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px">
+                  Monitor ultra compacto de la cocina.
+                </p>
+                <div id="listaPendientesMini">Cargando...</div>
+              </div>
+
+              <div
+                id="dash-stock"
+                style="display: none; flex-grow: 1; overflow-y: auto"
+              >
+                <div id="listaStockMini">Cargando...</div>
+              </div>
+              <div
+                id="dash-movimientos"
+                style="display: none; flex-grow: 1; overflow-y: auto"
+              >
+                <div
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 12px;
+                    background: #111;
+                    padding: 8px;
+                    border-radius: 8px;
+                  "
+                >
+                  <input
+                    type="text"
+                    id="filtroBuscadorMovimientos"
+                    placeholder="Buscar por N° Orden o Tipo..."
+                    style="
+                      margin-bottom: 0;
+                      flex-grow: 1;
+                      padding: 10px;
+                      border: none;
+                    "
+                    onkeyup="renderizarTablaMovimientos()"
+                  />
+                </div>
+                <div id="listaMovimientosMini">Cargando movimientos...</div>
+              </div>
+              <div
+                id="dash-gastos"
+                style="
+                  display: none;
+                  flex-grow: 1;
+                  overflow-y: auto;
+                  position: relative;
+                "
+              >
+                <button
+                  class="btn-primary"
+                  style="margin-bottom: 15px"
+                  onclick="abrirModalGasto()"
+                >
+                  Nuevo Gasto / Retiro
+                </button>
+                <div
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 12px;
+                    background: #111;
+                    padding: 8px;
+                    border-radius: 8px;
+                  "
+                >
+                  <input
+                    type="text"
+                    id="filtroBuscadorGastos"
+                    placeholder="Buscar gasto..."
+                    style="
+                      margin-bottom: 0;
+                      flex-grow: 1;
+                      padding: 10px;
+                      border: none;
+                    "
+                    onkeyup="renderizarTablaGastos()"
+                  />
+                </div>
+                <div
+                  style="
+                    background: rgba(255, 94, 0, 0.1);
+                    border: 1px solid var(--primary);
+                    padding: 10px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    text-align: center;
+                  "
+                >
+                  <strong style="color: var(--primary); font-size: 1.1rem"
+                    >Total Gastos: <span id="totalGastosVista">$0</span></strong
+                  >
+                </div>
+                <div id="listaGastosMini">Cargando gastos...</div>
+              </div>
+            </div>
+
+            <div
+              id="formRegistroBox"
+              style="
+                display: none;
+                flex-direction: column;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 20px;
+                background: #161616;
+                overflow-y: auto;
+                z-index: 50;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 15px;
+                "
+              >
+                <h3 style="color: var(--primary)" id="tituloRegistroVenta">
+                  Registro de Venta
+                </h3>
+                <button
+                  onclick="cerrarRegistroForm()"
+                  style="
+                    background: none;
+                    border: none;
+                    color: #aaa;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                  "
+                >
+                  ✕
+                </button>
+              </div>
+
+              <input type="hidden" id="vEditVentaId" />
+
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+              >
+                <div>
+                  <label class="input-label">Cliente</label
+                  ><input
+                    id="vCliente"
+                    placeholder="Nombre completo"
+                    style="padding: 10px"
+                  />
+                </div>
+                <div>
+                  <label class="input-label">Teléfono</label
+                  ><input
+                    id="vTelefono"
+                    placeholder="Número (Opcional)"
+                    style="padding: 10px"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="input-label">Dirección</label
+                ><input
+                  id="vDireccion"
+                  placeholder="Dirección de envío"
+                  style="padding: 10px; margin-bottom: 10px"
+                />
+              </div>
+
+              <div
+                style="
+                  background: #111;
+                  padding: 12px;
+                  border-radius: 10px;
+                  margin-bottom: 10px;
+                  border: 1px solid #222;
+                "
+              >
+                <label class="input-label">Añadir Productos</label>
+                <input
+                  type="text"
+                  id="vFiltroProducto"
+                  placeholder="Escribe para buscar..."
+                  onkeyup="filtrarBuscador()"
+                  style="padding: 10px"
+                />
+                <div style="display: flex; gap: 5px">
+                  <select
+                    id="vProductosSelect"
+                    style="margin-bottom: 0; flex-grow: 1; padding: 10px"
+                  >
+                    <option>Cargando...</option>
+                  </select>
+                  <input
+                    type="number"
+                    id="vCantidad"
+                    value="1"
+                    min="1"
+                    style="
+                      width: 60px;
+                      margin-bottom: 0;
+                      text-align: center;
+                      padding: 10px;
+                    "
+                  />
+                  <button
+                    class="btn-primary"
+                    style="width: auto; padding: 0 15px"
+                    onclick="iniciarAgregadoProducto()"
+                  >
+                    Añadir
+                  </button>
+                </div>
+                <div
+                  id="vListaItems"
+                  style="margin-top: 10px; max-height: 150px; overflow-y: auto"
+                ></div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: flex-end;
+                  margin-bottom: 10px;
+                  background: #222;
+                  padding: 10px;
+                  border-radius: 10px;
+                "
+              >
+                <div style="flex-grow: 1">
+                  <label class="input-label">Costo Envío ($)</label>
+                  <input
+                    type="number"
+                    id="vEnvio"
+                    placeholder="0"
+                    value="0"
+                    style="margin: 0; padding: 10px"
+                    onkeyup="actualizarPreviewVenta()"
+                    onchange="actualizarPreviewVenta()"
+                  />
+                </div>
+                <div style="margin-bottom: 0">
+                  <label
+                    style="
+                      background: #111;
+                      padding: 10px 15px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      cursor: pointer;
+                      font-size: 0.9rem;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      id="vRetiroLocal"
+                      onchange="toggleEnvio()"
+                      style="width: auto; margin: 0; transform: scale(1.1)"
+                    />
+                    <span style="color: var(--primary)">Retiro Local</span>
+                  </label>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 8px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div>
+                  <label class="input-label">Total Calc.</label>
+                  <input
+                    type="number"
+                    id="vTotal"
+                    readonly
+                    style="
+                      border: 2px solid #2196f3;
+                      font-weight: bold;
+                      font-size: 1.1rem;
+                      color: #2196f3;
+                      background: #111;
+                      padding: 10px;
+                    "
+                  />
+                </div>
+                <div>
+                  <label class="input-label" style="color: var(--primary)"
+                    >Total Manual</label
+                  >
+                  <input
+                    type="number"
+                    id="vTotalManual"
+                    placeholder="Opcional"
+                    style="
+                      border: 2px solid var(--primary);
+                      font-weight: bold;
+                      font-size: 1.1rem;
+                      color: var(--primary);
+                      background: #111;
+                      padding: 10px;
+                    "
+                  />
+                </div>
+                <div>
+                  <label class="input-label">Método</label>
+                  <select
+                    id="vMetodoPago"
+                    onchange="toggleMitadPago()"
+                    style="padding: 10px"
+                  >
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transf.</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Efectivo y Transferencia">
+                      Efec+Transf
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="input-label">Estado</label>
+                  <select id="vEstado" style="padding: 10px">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Listo">Listo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div
+                id="divMitadPago"
+                style="
+                  display: none;
+                  background: rgba(255, 94, 0, 0.05);
+                  padding: 10px;
+                  border-radius: 8px;
+                  margin-bottom: 10px;
+                  border: 1px dashed var(--primary);
+                "
+              >
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                  "
+                >
+                  <div>
+                    <label class="input-label" style="font-size: 0.75rem"
+                      >Monto Efec. ($)</label
+                    ><input
+                      type="number"
+                      id="vMontoEfectivo"
+                      placeholder="0"
+                      style="margin: 0; padding: 8px"
+                    />
+                  </div>
+                  <div>
+                    <label class="input-label" style="font-size: 0.75rem"
+                      >Monto Transf. ($)</label
+                    ><input
+                      type="number"
+                      id="vMontoTransf"
+                      placeholder="0"
+                      style="margin: 0; padding: 8px"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <label class="input-label">Notas</label>
+              <textarea
+                id="vDetalles"
+                placeholder="Opcional"
+                rows="2"
+                style="padding: 10px; margin-bottom: 10px"
+              ></textarea>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  margin-bottom: 15px;
+                  margin-top: auto;
+                "
+              >
+                <input
+                  type="checkbox"
+                  id="vDescontarStock"
+                  checked
+                  style="width: auto; margin: 0"
+                />
+                <label
+                  for="vDescontarStock"
+                  style="color: #888; font-size: 0.8rem"
+                  >Descontar/Reponer stock automático</label
+                >
+              </div>
+
+              <button
+                class="btn-primary"
+                onclick="intentarGuardarVenta()"
+                id="btnGuardarVenta"
+                style="
+                  padding: 15px;
+                  font-size: 1.1rem;
+                  box-shadow: 0 4px 10px rgba(255, 94, 0, 0.3);
+                "
+              >
+                Guardar Pedido
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-inventario" class="tab-content">
+        <div class="layout-ventas">
+          <!-- Panel Izquierdo: Base de Datos Actual -->
+          <div class="panel-izquierdo">
+            <div class="historial-header" style="margin-bottom: 15px">
+              <h3
+                style="margin: 0; display: flex; align-items: center; gap: 8px"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                </svg>
+                Base de Datos Actual
+              </h3>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                margin-bottom: 15px;
+                background: #111;
+                padding: 8px;
+                border-radius: 8px;
+              "
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#666"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 8px; margin-left: 5px"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                id="filtroBuscadorInventario"
+                placeholder="Buscar producto en la base de datos..."
+                style="
+                  margin-bottom: 0;
+                  flex-grow: 1;
+                  padding: 10px;
+                  border: none;
+                  background: transparent;
+                  color: #fff;
+                "
+                onkeyup="
+                  if (typeof window.renderizarNube === 'function')
+                    window.renderizarNube();
+                "
+              />
+            </div>
+
+            <div
+              id="listaAdmin"
+              class="tabla-scroll"
+              style="flex-grow: 1; overflow-y: auto; height: 100%"
+            >
+              Cargando base de datos...
+            </div>
+          </div>
+
+          <!-- Panel Derecho: Formulario Añadir/Editar -->
+          <div class="panel-derecho">
+            <div
+              class="admin-card"
+              style="
+                margin: 0;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+              "
+            >
+              <h3
+                id="tituloFormAdmin"
+                style="
+                  margin-bottom: 20px;
+                  color: var(--primary);
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                "
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 20h9"></path>
+                  <path
+                    d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                  ></path>
+                </svg>
+                Nube: Añadir Nuevo Producto
+              </h3>
+
+              <input type="hidden" id="editId" />
+
+              <div style="display: flex; gap: 10px; margin-bottom: 12px">
+                <select id="tipoItemAdmin" style="flex: 1; margin-bottom: 0">
+                  <option value="producto">🍔 Producto Principal</option>
+                  <option value="bebida">🥤 Bebida / Acompañamiento</option>
+                </select>
+                <select
+                  id="catAdmin"
+                  style="margin-bottom: 0; flex: 1"
+                ></select>
+                <button
+                  class="btn-primary"
+                  style="width: auto; padding: 0 15px"
+                  onclick="agregarNuevaCategoria()"
+                  title="Nueva Categoría"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <input id="nombreAdmin" placeholder="Nombre del Producto" />
+
+              <div style="display: flex; gap: 10px">
+                <input
+                  id="precioAdmin"
+                  type="number"
+                  placeholder="Precio Base"
+                />
+                <input
+                  id="stockAdmin"
+                  type="number"
+                  placeholder="Stock Inicial"
+                />
+              </div>
+
+              <div class="upload-container">
+                <label
+                  for="fileUploadAdmin"
+                  id="dropzoneAdmin"
+                  class="upload-btn"
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="margin-bottom: 8px; color: var(--text-light)"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Haz clic aquí o arrastra tu archivo</span>
+                </label>
+                <input
+                  type="file"
+                  id="fileUploadAdmin"
+                  accept="image/*,video/*"
+                  style="display: none"
+                />
+                <input type="hidden" id="imgAdmin" />
+
+                <div
+                  id="uploadPreviewContainer"
+                  style="display: none; margin-top: 15px"
+                >
+                  <div
+                    id="cropperWrapper"
+                    style="
+                      display: none;
+                      max-height: 400px;
+                      overflow: hidden;
+                      border-radius: 8px;
+                    "
+                  >
+                    <img
+                      id="imageToCrop"
+                      style="max-width: 100%; display: block"
+                      src=""
+                      alt="Recortar imagen"
+                    />
+                  </div>
+                  <p
+                    id="imageHelperText"
+                    style="
+                      display: none;
+                      font-size: 0.8rem;
+                      color: #aaa;
+                      margin-top: 5px;
+                      text-align: center;
+                    "
+                  >
+                    Tamaño recomendado: 800x600px. El editor adaptará la imagen
+                    automáticamente.
+                  </p>
+
+                  <div
+                    id="videoPreviewWrapper"
+                    style="
+                      display: none;
+                      width: 100%;
+                      aspect-ratio: 4/3;
+                      background: #000;
+                      border-radius: 8px;
+                      overflow: hidden;
+                      position: relative;
+                    "
+                  >
+                    <video
+                      id="videoPreview"
+                      autoplay
+                      loop
+                      muted
+                      style="width: 100%; height: 100%; object-fit: cover"
+                    ></video>
+                  </div>
+                  <p
+                    id="videoHelperText"
+                    style="
+                      display: none;
+                      font-size: 0.8rem;
+                      color: #aaa;
+                      margin-top: 5px;
+                      text-align: center;
+                    "
+                  >
+                    Recomendado: 5-10 seg, horizontal, máx 10MB.
+                  </p>
+
+                  <div
+                    id="uploadStatus"
+                    style="
+                      font-size: 0.85rem;
+                      color: var(--primary);
+                      text-align: center;
+                      margin-top: 10px;
+                      font-weight: bold;
+                    "
+                  ></div>
+                </div>
+              </div>
+
+              <textarea
+                id="ingredientesAdmin"
+                placeholder="Ingredientes (ej: Pan, Carne, Cheddar, Bacon...)"
+                rows="4"
+                style="resize: vertical; font-family: inherit; margin-bottom: 10px; padding: 12px; min-height: 80px;"
+              ></textarea>
+
+              <div class="opciones-tags-container" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Tipos -->
+                <div class="tag-group" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #4CAF50; font-size: 0.9em;">Tipos / Tamaños</strong>
+                    <button id="btnAgregarTipo" type="button" class="btn-primary" style="padding: 5px 10px; font-size: 0.8em; border-radius: 4px;">+ Agregar</button>
+                  </div>
+                  <div id="tagsTipos" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+
+                <!-- Extras -->
+                <div class="tag-group" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #ff9800; font-size: 0.9em;">Adicionales / Extras</strong>
+                    <button id="btnAgregarExtra" type="button" class="btn-primary" style="padding: 5px 10px; font-size: 0.8em; border-radius: 4px; background: #ff9800; color: #111;">+ Agregar</button>
+                  </div>
+                  <div id="tagsExtras" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+
+                <!-- Quitar -->
+                <div class="tag-group" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #ff5722; font-size: 0.9em;">A Quitar / Sin...</strong>
+                    <button id="btnAgregarQuitar" type="button" class="btn-primary" style="padding: 5px 10px; font-size: 0.8em; border-radius: 4px; background: #ff5722;">+ Agregar</button>
+                  </div>
+                  <div id="tagsQuitar" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  margin-top: auto;
+                  padding-top: 20px;
+                "
+              >
+                <button
+                  class="btn-primary"
+                  id="btnGuardarAdmin"
+                  onclick="guardarProductoEnNube()"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 6px"
+                  >
+                    <path
+                      d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                    ></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline></svg
+                  >Guardar en la Nube
+                </button>
+                <button
+                  class="btn-primary"
+                  style="background: #555; display: none"
+                  id="btnCancelarEdicion"
+                  onclick="limpiarFormulario()"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 6px"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line></svg
+                  >Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-pd" class="tab-content">
+        <div class="admin-card" style="max-width: 900px; margin: 0 auto">
+          <h3 style="color: var(--primary); margin-bottom: 15px">
+            🎁 Programa de Descuentos (PD)
+          </h3>
+          <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 20px">
+            Los clientes acumulan 1 punto por compra. Si no compran en 4 meses
+            pierden el progreso automáticamente. Al llegar a 10, se genera el
+            premio.
+          </p>
+          <div id="pd-ui">Cargando Programa de Descuentos...</div>
+        </div>
+      </div>
+
+      <div id="tab-usuarios" class="tab-content">
+        <div class="admin-card" style="max-width: 1000px; margin: 0 auto">
+          <h3 style="color: var(--primary); margin-bottom: 15px">
+            👥 Gestionar Usuarios
+          </h3>
+          <p>En construcción - Aquí se gestionarán los roles y usuarios.</p>
+        </div>
+      </div>
+
+      <div id="tab-editor-menu" class="tab-content">
+        <div
+          class="admin-card"
+          style="
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+          "
+        >
+          <h3 style="color: var(--primary); margin-bottom: 15px">
+            🎨 Editar Menú Visual
+          </h3>
+
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 15px;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 10px;
+            "
+          >
+            <div style="display: flex; gap: 10px">
+              <button
+                class="btn-primary"
+                id="btn-view-mobile"
+                onclick="setEditorViewport('mobile')"
+                style="width: auto; padding: 8px 15px; font-size: 0.9rem"
+              >
+                📱 Celular
+              </button>
+              <button
+                class="btn-primary"
+                id="btn-view-tablet"
+                onclick="setEditorViewport('tablet')"
+                style="
+                  background: #444;
+                  width: auto;
+                  padding: 8px 15px;
+                  font-size: 0.9rem;
+                "
+              >
+                💊 Tablet
+              </button>
+              <button
+                class="btn-primary"
+                id="btn-view-pc"
+                onclick="setEditorViewport('pc')"
+                style="
+                  background: #444;
+                  width: auto;
+                  padding: 8px 15px;
+                  font-size: 0.9rem;
+                "
+              >
+                💻 PC
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px">
+              <label style="color: var(--text-light); font-size: 0.9rem"
+                >Columnas:</label
+              >
+              <select
+                id="editor-columns"
+                style="
+                  margin-bottom: 0;
+                  padding: 8px;
+                  width: auto;
+                  font-size: 0.9rem;
+                "
+                onchange="updateEditorColumns()"
+              >
+                <option value="2">2 Columnas</option>
+                <option value="3">3 Columnas</option>
+                <option value="4">4 Columnas</option>
+                <option value="5">5 Columnas</option>
+              </select>
+              <button
+                class="btn-primary"
+                onclick="guardarConfigLayout()"
+                style="
+                  width: auto;
+                  padding: 8px 15px;
+                  font-size: 0.9rem;
+                  background: #00c853;
+                "
+              >
+                💾 Guardar Configuración
+              </button>
+            </div>
+          </div>
+
+          <div
+            style="
+              flex-grow: 1;
+              overflow-y: auto;
+              background: #111;
+              border-radius: 10px;
+              border: 1px solid #333;
+              padding: 15px;
+              display: flex;
+              justify-content: center;
+            "
+          >
+            <div
+              id="editor-canvas"
+              style="
+                width: 100%;
+                max-width: 400px;
+                transition: max-width 0.3s;
+                background: var(--bg);
+                padding: 10px;
+                border-radius: 10px;
+                min-height: 300px;
+              "
+            >
+              <div
+                id="editor-grid"
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 8px;
+                  min-height: 100px;
+                "
+              >
+                <!-- Productos editables aqui -->
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 15px">
+            <h4
+              style="
+                color: var(--text-light);
+                font-size: 0.9rem;
+                margin-bottom: 10px;
+              "
+            >
+              📦 Dock (Elementos Ocultos)
+            </h4>
+            <div
+              id="editor-dock"
+              style="
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 15px;
+                background: #222;
+                border-radius: 10px;
+                border: 1px dashed #555;
+                min-height: 120px;
+              "
+            >
+              <!-- Productos ocultos aqui -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalConfigProd" class="modal-overlay">
+      <div class="modal-box">
+        <button
+          class="btn-cerrar-modal"
+          onclick="
+            document.getElementById('modalConfigProd').style.display = 'none'
+          "
+        >
+          ✕
+        </button>
+        <h3
+          style="color: var(--primary); margin-bottom: 5px"
+          id="tituloConfigProd"
+        >
+          Configurar Producto
+        </h3>
+        <div id="uiConfigProd"></div>
+      </div>
+    </div>
+
+    <div id="modalDetalleVenta" class="modal-overlay">
+      <div class="modal-box">
+        <button
+          class="btn-cerrar-modal"
+          onclick="
+            document.getElementById('modalDetalleVenta').style.display = 'none'
+          "
+        >
+          ✕
+        </button>
+        <div id="contenidoDetalleVenta"></div>
+      </div>
+    </div>
+
+    <div id="modalGasto" class="modal-overlay">
+      <div class="modal-box">
+        <h3
+          style="color: var(--primary); margin-bottom: 15px"
+          id="tituloModalGasto"
+        >
+          Registrar Gasto
+        </h3>
+        <input type="hidden" id="gastoEditId" />
+        <label class="input-label">Nombre / Título</label>
+        <input
+          type="text"
+          id="gastoNombre"
+          placeholder="Ej: Empleados, Bolsas"
+        />
+        <label class="input-label">Descripción</label>
+        <input type="text" id="gastoDesc" placeholder="Detalle (opcional)" />
+        <label class="input-label">Monto ($)</label>
+        <input
+          type="number"
+          id="gastoMonto"
+          placeholder="Permite negativos para retiros"
+        />
+        <label class="input-label">Nota (Opcional)</label>
+        <textarea
+          id="gastoNota"
+          rows="2"
+          placeholder="Información extra..."
+        ></textarea>
+        <div style="display: flex; gap: 10px; margin-top: 15px">
+          <button class="btn-primary" onclick="guardarGasto()">Guardar</button>
+          <button
+            class="btn-primary"
+            style="background: #444"
+            onclick="
+              document.getElementById('modalGasto').style.display = 'none'
+            "
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalAvisoEfTr" class="modal-overlay">
+      <div class="modal-box alerta">
+        <h2 style="color: #ffcc00; margin-bottom: 15px">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 8px"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            ></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+          >Atención
+        </h2>
+        <p style="margin-bottom: 25px; color: #ddd; font-size: 0.95rem">
+          Seleccionaste "Efectivo y Transferencia" pero no colocaste los montos
+          en el detalle.<br /><br />¿Estás seguro que deseas guardar el pedido
+          así?
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center">
+          <button
+            class="btn-primary"
+            style="background: #444"
+            onclick="
+              document.getElementById('modalAvisoEfTr').style.display = 'none'
+            "
+          >
+            Cancelar y Editar
+          </button>
+          <button
+            class="btn-primary"
+            style="background: #ffcc00; color: #111"
+            onclick="ejecutarGuardado()"
+          >
+            Sí, Guardar Igual
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalCancelacion" class="modal-overlay">
+      <div class="modal-box cancelar">
+        <h3 style="color: #ff3c3c; margin-bottom: 10px">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 8px"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            ></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+          >Cancelar Pedido
+        </h3>
+        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 15px">
+          Escribe el motivo de la cancelación. Los productos volverán al stock y
+          se restará 1 punto en el PD (si corresponde).
+        </p>
+        <input type="hidden" id="cancelIdVenta" />
+        <input
+          type="text"
+          id="cancelMotivo"
+          placeholder="Motivo (Ej: Cliente no respondió)"
+        />
+        <div
+          id="cancelListaStock"
+          style="
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+          "
+        ></div>
+        <div style="display: flex; gap: 10px">
+          <button
+            class="btn-primary"
+            style="background: #ff3c3c"
+            onclick="confirmarCancelacion()"
+          >
+            Confirmar Cancelación
+          </button>
+          <button
+            class="btn-primary"
+            style="background: #444"
+            onclick="
+              document.getElementById('modalCancelacion').style.display = 'none'
+            "
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Impresión Ticket -->
+    <div id="modalImpresion" class="modal-overlay">
+      <div class="modal-box">
+        <button class="btn-cerrar-modal" onclick="document.getElementById('modalImpresion').style.display = 'none'">&times;</button>
+        <h2 style="margin-bottom: 15px;">Imprimir Ticket</h2>
+
+        <div id="impresionAppNoDetectada">
+          <p style="margin-bottom: 15px; color: #ff6b6b;"><strong>Aplicación de Escritorio No Detectada</strong></p>
+          <p style="margin-bottom: 15px; line-height: 1.5; font-size: 0.9em;">Para poder usar la integración nativa y seleccionar cualquier impresora de Windows, necesitas nuestra aplicación de escritorio.</p>
+          <button class="btn-primary" style="background: #4CAF50; width: 100%; margin-bottom: 20px;" onclick="window.open('#', '_blank')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Descargar App
+          </button>
+
+          <hr style="border-color: #333; margin-bottom: 20px;">
+
+          <p style="margin-bottom: 15px; color: #4db8ff;"><strong>Imprimir desde el Navegador (WebUSB / Zadig)</strong></p>
+          <p style="margin-bottom: 15px; line-height: 1.5; font-size: 0.9em;">Si tienes instalado el driver WinUSB (ej. mediante Zadig), puedes imprimir directamente desde aquí.</p>
+
+          <button id="btnVincularWebUSB" class="btn-primary" style="background: #222; border: 1px solid #4db8ff; color: #4db8ff; width: 100%; margin-bottom: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Vincular Impresora WebUSB
+          </button>
+
+          <div id="infoWebUSBConectado" style="display: none; background: #1a2c1f; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; color: #4CAF50; border: 1px solid #2e5939;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span id="nombreImpresoraWebUSB">Impresora Vinculada</span>
+          </div>
+
+          <button id="btnImprimirWebUSB" class="btn-primary" style="background: #4db8ff; width: 100%; display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Imprimir vía WebUSB
+          </button>
+        </div>
+
+        <div id="impresionAppDetectada" style="display: none;">
+          <p style="margin-bottom: 15px; color: #4CAF50;"><strong>Aplicación de Escritorio Detectada Correctamente</strong></p>
+          <div class="form-group">
+            <label>Selecciona tu Impresora (Nativa):</label>
+            <select id="selectImpresora" class="form-control" style="background: #222; color: #fff; border: 1px solid #444; width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+              <option value="">Cargando impresoras...</option>
+            </select>
+            <button id="btnConfirmarImpresion" class="btn-primary" style="background: #4CAF50; width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Imprimir Ticket
+            </button>
+          </div>
+
+          <hr style="border-color: #333; margin-bottom: 20px; margin-top: 20px;">
+
+          <p style="margin-bottom: 15px; color: #4db8ff;"><strong>Alternativa: WebUSB (Navegador Directo)</strong></p>
+          <p style="margin-bottom: 15px; line-height: 1.5; font-size: 0.9em;">Si usaste Zadig para cambiar el driver, la impresora no aparecerá arriba. Usa esta opción:</p>
+
+          <button id="btnVincularWebUSBApp" class="btn-primary" style="background: #222; border: 1px solid #4db8ff; color: #4db8ff; width: 100%; margin-bottom: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Vincular Impresora WebUSB
+          </button>
+
+          <div id="infoWebUSBConectadoApp" style="display: none; background: #1a2c1f; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; color: #4CAF50; border: 1px solid #2e5939;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span id="nombreImpresoraWebUSBApp">Impresora Vinculada</span>
+          </div>
+
+          <button id="btnImprimirWebUSBApp" class="btn-primary" style="background: #4db8ff; width: 100%; display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Imprimir vía WebUSB
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Etiqueta Opciones -->
+    <div id="modalEtiqueta" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px;">
+        <button class="btn-cerrar-modal" onclick="document.getElementById('modalEtiqueta').style.display = 'none'">&times;</button>
+        <h2 id="tituloModalEtiqueta" style="margin-bottom: 15px;">Agregar Etiqueta</h2>
+
+        <input type="hidden" id="tagModalCategoria" />
+        <input type="hidden" id="tagModalIndex" />
+
+        <div class="form-group">
+          <label>Nombre de la opción:</label>
+          <input id="tagModalNombre" class="form-control" type="text" placeholder="Ej: Simple, Cheddar, Sin Pan" style="text-transform: capitalize;" />
+        </div>
+
+        <div class="form-group">
+          <label>Modificador de Precio ($):</label>
+          <input id="tagModalPrecio" class="form-control" type="number" placeholder="Ej: 1000, 0, -500" />
+          <small style="color: #888;">Usa 0 si no modifica el precio, o un número negativo para descontar.</small>
+        </div>
+
+        <button id="btnGuardarEtiqueta" class="btn-primary" style="width: 100%; margin-top: 15px;">
+          Guardar Opción
+        </button>
+      </div>
+    </div>
+
+    <div id="toast-alerta"></div>
+
+    <script type="module" src="src/admin/app.js"></script>
+  </body>
+</html>

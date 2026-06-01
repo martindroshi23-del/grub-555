@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grub - Pizzas & Hamburguesas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/client.css">
+</head>
+<body>
+
+  <header><h1>🍕 Grub</h1></header>
+
+  <div class="quick-links-container" id="quickLinks"></div>
+  <div id="menu-contenedor" style="padding-top: 20px; text-align: center; color: var(--text-light);">Cargando menú en vivo...</div>
+
+  <button id="btnCarrito" class="btn-flotante" onclick="abrirCarrito()">
+    🛒 Ver pedido (<span id="cantidadTotal">0</span>) - $<span id="precioTotalFloat">0</span>
+  </button>
+
+  <div id="modalProducto" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-cerrar" onclick="cerrarModal('modalProducto')">✕</button>
+      <div id="uiProducto"></div>
+    </div>
+  </div>
+
+  <div id="modalCarrito" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-cerrar" onclick="cerrarModal('modalCarrito')">✕</button>
+      <h2 style="margin-bottom:20px; font-weight: 700;">Tu Pedido</h2>
+      <div id="listaCarrito"></div>
+      <h3 style="text-align:right; margin: 20px 0; color: var(--primary);">Total: $<span id="totalCarritoTexto">0</span></h3>
+      
+      <div class="opcion-grupo" style="margin-top: 25px;">
+        <label class="input-label">TU NOMBRE</label>
+        <input id="nombreCliente" placeholder="Ej: Juan Pérez">
+        <label class="input-label" style="margin-top: 15px;">DIRECCIÓN PARA EL ENVÍO</label>
+        <input id="dirCliente" placeholder="Ej: Calle 23 entre 2 y 4, casa 27">
+      </div>
+      
+      <button class="btn-enviar-final" onclick="enviarPedido(event)">📲 Enviar pedido por WhatsApp</button>
+    </div>
+  </div>
+
+  <div id="toast-alerta"></div>
+
+<script type="module" src="src/client/app.js"></script>
+</body>
+</html>
