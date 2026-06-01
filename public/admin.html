@@ -152,6 +152,24 @@
         </svg>
       </button>
 
+      <button
+        class="sidebar-btn"
+        data-tooltip="Configuraciones"
+        onclick="cambiarTab('tab-config', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+
       <div style="flex-grow: 1"></div>
 
       <button
@@ -1317,6 +1335,25 @@
             👥 Gestionar Usuarios
           </h3>
           <p>En construcción - Aquí se gestionarán los roles y usuarios.</p>
+        </div>
+      </div>
+
+      <div id="tab-config" class="tab-content">
+        <div class="admin-card" style="max-width: 1000px; margin: 0 auto">
+          <h3 style="color: var(--primary); margin-bottom: 15px">
+            ⚙️ Configuraciones
+          </h3>
+
+          <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; border-radius: 8px; background: #222;">
+              <h4 style="margin-bottom: 10px; color: var(--text-light);">Configurar WhatsApp</h4>
+              <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">Establece el número de teléfono al que se derivarán los clientes para enviar su pedido por WhatsApp (Ej: 5491123456789).</p>
+
+              <label class="input-label">Número de WhatsApp</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                  <input type="text" id="config-whatsapp-number" placeholder="Ej: 5491123456789" style="flex: 1;" />
+                  <button class="btn-primary" onclick="guardarConfigWhatsApp()" style="width: auto; padding: 10px 20px;">Guardar Configuración</button>
+              </div>
+          </div>
         </div>
       </div>
 

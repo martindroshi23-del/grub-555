@@ -330,10 +330,10 @@ th {
 }
 
 .btn-estado {
-  padding: 6px 10px;
+  padding: 10px;
   border-radius: 6px;
   font-weight: bold;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   cursor: pointer;
   border: none;
   display: flex;
@@ -341,21 +341,16 @@ th {
   justify-content: center;
   width: 100%;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .btn-estado.pendiente {
   background: rgba(255, 204, 0, 0.2);
   color: #ffcc00;
-  font-size: 0.95rem;
-  padding: 10px;
 }
 .btn-estado.listo {
   background: rgba(0, 200, 83, 0.2);
   color: #00c853;
-  pointer-events: none;
-  font-size: 0.95rem;
-  padding: 10px;
 }
 .btn-estado.cancelado {
   background: rgba(255, 60, 60, 0.2);

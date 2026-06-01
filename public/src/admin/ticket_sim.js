@@ -68,20 +68,42 @@ window.renderTicketSimulador = () => {
 
     let htmlPrincipales = "";
     itemsPrincipales.forEach(item => {
+        let precioCalculado = item.precioFinal ? (item.precioFinal * item.cantidad) : (item.precio ? item.precio * item.cantidad : item.subtotal || 0);
         htmlPrincipales += `
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                 <span style="flex:1;">${item.cantidad}x ${item.nombreBase}</span>
-                <span>$${item.subtotal || 0}</span>
+                <span>$${precioCalculado}</span>
             </div>
         `;
-        if (item.modificadores && item.modificadores.length > 0) {
-            htmlPrincipales += `<div style="padding-left: 10px; font-size: 12px; margin-bottom: 5px;">`;
-            item.modificadores.forEach(m => {
-                if (m.tipo === "A quitar") {
-                    htmlPrincipales += `<div style="font-weight: bold;">- ${m.nombre}</div>`;
+
+        let extraInfo = [];
+        if (item.desglose) {
+            for (let key in item.desglose) {
+                let val = item.desglose[key];
+                if (key === 'A quitar' || key === 'Sin') {
+                    extraInfo.push({ texto: `- ${val}`, bold: true });
                 } else {
-                    htmlPrincipales += `<div>+ ${m.nombre}</div>`;
+                    extraInfo.push({ texto: `+ ${val}`, bold: false });
                 }
+            }
+        } else if (item.modificadores && item.modificadores.length > 0) {
+             item.modificadores.forEach(m => {
+                if (m.tipo === "A quitar" || m.tipo === "Sin") {
+                     extraInfo.push({ texto: `- ${m.nombre}`, bold: true });
+                } else {
+                     extraInfo.push({ texto: `+ ${m.nombre}`, bold: false });
+                }
+            });
+        }
+
+        if (extraInfo.length > 0) {
+            htmlPrincipales += `<div style="padding-left: 10px; font-size: 12px; margin-bottom: 5px; line-height: 1.2;">`;
+            extraInfo.forEach(info => {
+                 if (info.bold) {
+                     htmlPrincipales += `<div style="font-weight: bold;">${info.texto}</div>`;
+                 } else {
+                     htmlPrincipales += `<div>${info.texto}</div>`;
+                 }
             });
             htmlPrincipales += `</div>`;
         }
@@ -90,10 +112,11 @@ window.renderTicketSimulador = () => {
 
     let htmlBebidas = "";
     bebidas.forEach(item => {
+         let precioCalculado = item.precioFinal ? (item.precioFinal * item.cantidad) : (item.precio ? item.precio * item.cantidad : item.subtotal || 0);
          htmlBebidas += `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                 <span style="flex:1;">${item.cantidad}x ${item.nombreBase}</span>
-                <span>$${item.subtotal || 0}</span>
+                <span>$${precioCalculado}</span>
             </div>
         `;
     });
