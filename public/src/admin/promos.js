@@ -16,7 +16,8 @@ async function invalidarCacheMenu() {
 
 // Global state
 let todosLosProductos = [];
-let fileToUpload = null;
+let promoCropper = null;
+let currentPromoFile = null;
 
 // Initialize Promos logic once DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,26 +46,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Image upload handling (reuse Cloudinary logic if possible, or basic file reader)
+    // Image upload handling with Cropper.js for roughly 2.3:1 ratio
     const fileInput = document.getElementById('promoImageUpload');
+    const cropperImage = document.getElementById('promoCropperImage');
+    const cropperContainer = document.getElementById('promoCropperContainer');
+
     if (fileInput) {
         fileInput.addEventListener('change', (e) => {
             if (e.target.files && e.target.files[0]) {
-                fileToUpload = e.target.files[0];
+                currentPromoFile = e.target.files[0];
+
+                if (promoCropper) {
+                    promoCropper.destroy();
+                    promoCropper = null;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    document.getElementById('promoCropperImage').src = ev.target.result;
-                    document.getElementById('promoCropperContainer').style.display = 'block';
+                    cropperImage.src = ev.target.result;
+                    cropperContainer.style.display = 'block';
+
+                    promoCropper = new Cropper(cropperImage, {
+                        aspectRatio: 2.3 / 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false
+                    });
                 };
-                reader.readAsDataURL(fileToUpload);
+                reader.readAsDataURL(currentPromoFile);
             }
         });
     }
 });
 
 function renderizarSelectProductos() {
-    const select = document.getElementById("ofertaSelectProducto");
-    if (!select) return;
+    const selectOferta = document.getElementById("ofertaSelectProducto");
+    const selectPromo = document.getElementById("promoSelectProducto");
 
     // Solo productos normales (no banners)
     let productosNormales = todosLosProductos.filter(p => !p.esPromoBanner);
@@ -77,9 +94,12 @@ function renderizarSelectProductos() {
         options += `<option value="${p.id}">${p.nombre} - $${p.precio}</option>`;
     });
 
-    // Only update if not currently focused to prevent UI jank
-    if (document.activeElement !== select) {
-        select.innerHTML = options;
+    if (selectOferta && document.activeElement !== selectOferta) {
+        selectOferta.innerHTML = options;
+    }
+
+    if (selectPromo && document.activeElement !== selectPromo) {
+        selectPromo.innerHTML = options;
     }
 }
 
@@ -139,14 +159,22 @@ window.guardarPromoBanner = async () => {
     const status = document.getElementById("promoUploadStatus");
     const nombre = document.getElementById("promoNombre").value.trim();
     const precio = parseInt(document.getElementById("promoPrecio").value);
+    const descripcion = document.getElementById("promoDescripcion").value.trim();
+    const idProductoAsociado = document.getElementById("promoSelectProducto").value;
+    const activo = document.getElementById("promoActivo").checked;
 
     if (!nombre || isNaN(precio)) {
         alert("Falta nombre o precio.");
         return;
     }
 
-    if (!fileToUpload) {
+    if (!currentPromoFile && !promoCropper) {
         alert("Debes subir una imagen para el banner.");
+        return;
+    }
+
+    if (!idProductoAsociado) {
+        alert("Debes asociar la promoción a un producto existente.");
         return;
     }
 
@@ -156,10 +184,12 @@ window.guardarPromoBanner = async () => {
     status.style.color = "#ff9800";
 
     try {
-        // Use Cloudinary logic
+        // Use Cloudinary logic with Cropper blob
+        const blob = await new Promise(resolve => promoCropper.getCroppedCanvas({ width: 1200, height: 522 }).toBlob(resolve, 'image/jpeg', 0.8));
+
         const formData = new FormData();
         formData.append('upload_preset', 'menu_grub');
-        formData.append('file', fileToUpload);
+        formData.append('file', blob);
 
         const res = await fetch('https://api.cloudinary.com/v1_1/dtsl83iyh/auto/upload', {
             method: 'POST',
@@ -179,6 +209,9 @@ window.guardarPromoBanner = async () => {
             categoria: "Promociones", // Just to have a category
             nombre: nombre,
             precio: precio,
+            descripcion: descripcion,
+            idProductoAsociado: idProductoAsociado,
+            activo: activo,
             img: imgUrl,
             stock: 9999, // practically infinite
             vistas: 0,
@@ -202,9 +235,16 @@ window.guardarPromoBanner = async () => {
         // Reset UI
         document.getElementById("promoNombre").value = "";
         document.getElementById("promoPrecio").value = "";
+        document.getElementById("promoDescripcion").value = "";
+        document.getElementById("promoSelectProducto").value = "";
+        document.getElementById("promoActivo").checked = true;
         document.getElementById("promoImageUpload").value = "";
         document.getElementById("promoCropperContainer").style.display = "none";
-        fileToUpload = null;
+        if (promoCropper) {
+            promoCropper.destroy();
+            promoCropper = null;
+        }
+        currentPromoFile = null;
         status.innerText = "¡Banner guardado exitosamente!";
         status.style.color = "#00c853";
         setTimeout(() => { status.innerText = ""; }, 3000);
