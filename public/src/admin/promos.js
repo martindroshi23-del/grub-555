@@ -18,9 +18,83 @@ async function invalidarCacheMenu() {
 let todosLosProductos = [];
 let promoCropper = null;
 let currentPromoFile = null;
+window._tagsPromoActuales = { tipos: [], extras: [] };
+
+window.renderizarTagsPromo = () => {
+    ['tipos', 'extras'].forEach(cat => {
+        const container = document.getElementById('tags' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Promo');
+        if(!container) return;
+        container.innerHTML = '';
+
+        window._tagsPromoActuales[cat].forEach((tag, idx) => {
+            const div = document.createElement('div');
+            let colorMap = { tipos: '#4CAF50', extras: '#ff9800' };
+            div.style.cssText = `background: ${colorMap[cat]}22; border: 1px solid ${colorMap[cat]}; color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 0.85em; display: flex; align-items: center; gap: 8px; cursor: pointer;`;
+
+            let precioTxt = tag.precio === 0 ? '' : (tag.precio > 0 ? `(+$${tag.precio})` : `(-$${Math.abs(tag.precio)})`);
+
+            div.innerHTML = `
+                <span onclick="window.editarEtiquetaPromo('${cat}', ${idx})">${tag.nombre} ${precioTxt}</span>
+                <span onclick="window.eliminarEtiquetaPromo('${cat}', ${idx})" style="color: #ff6b6b; font-weight: bold; margin-left: 5px;">&times;</span>
+            `;
+            container.appendChild(div);
+        });
+    });
+};
+
+window.abrirModalEtiquetaPromo = (categoria) => {
+    let tituloMap = { tipos: 'Tipo / Tamaño Promo', extras: 'Adicional / Extra Promo' };
+    document.getElementById('tituloModalEtiquetaPromo').innerText = `Agregar ${tituloMap[categoria]}`;
+    document.getElementById('tagModalCategoriaPromo').value = categoria;
+    document.getElementById('tagModalIndexPromo').value = '-1';
+    document.getElementById('tagModalNombrePromo').value = '';
+    document.getElementById('tagModalPrecioPromo').value = '0';
+    document.getElementById('modalEtiquetaPromo').style.display = 'flex';
+};
+
+window.editarEtiquetaPromo = (categoria, index) => {
+    let tag = window._tagsPromoActuales[categoria][index];
+    let tituloMap = { tipos: 'Tipo / Tamaño Promo', extras: 'Adicional / Extra Promo' };
+    document.getElementById('tituloModalEtiquetaPromo').innerText = `Editar ${tituloMap[categoria]}`;
+    document.getElementById('tagModalCategoriaPromo').value = categoria;
+    document.getElementById('tagModalIndexPromo').value = index;
+    document.getElementById('tagModalNombrePromo').value = tag.nombre;
+    document.getElementById('tagModalPrecioPromo').value = tag.precio;
+    document.getElementById('modalEtiquetaPromo').style.display = 'flex';
+};
+
+window.eliminarEtiquetaPromo = (categoria, index) => {
+    window._tagsPromoActuales[categoria].splice(index, 1);
+    window.renderizarTagsPromo();
+};
+
+window.guardarEtiquetaPromo = () => {
+    const categoria = document.getElementById('tagModalCategoriaPromo').value;
+    const index = parseInt(document.getElementById('tagModalIndexPromo').value);
+    let nombre = document.getElementById('tagModalNombrePromo').value.trim();
+    let precio = parseInt(document.getElementById('tagModalPrecioPromo').value) || 0;
+
+    if (!nombre) {
+        alert('El nombre no puede estar vacío');
+        return;
+    }
+
+    // Capitalize first letter
+    nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+    if (index === -1) {
+        window._tagsPromoActuales[categoria].push({ nombre, precio });
+    } else {
+        window._tagsPromoActuales[categoria][index] = { nombre, precio };
+    }
+
+    window.renderizarTagsPromo();
+    document.getElementById('modalEtiquetaPromo').style.display = 'none';
+};
 
 // Initialize Promos logic once DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
+    window.renderizarTagsPromo();
     // Listen to all products to populate the Ofertas select and lists
     onSnapshot(collection(db, "productos"), (snapshot) => {
         todosLosProductos = [];
@@ -210,13 +284,14 @@ window.guardarPromoBanner = async () => {
             nombre: nombre,
             precio: precio,
             descripcion: descripcion,
+            ingredientes: descripcion, // Map it so the UI renders it like normal product ingredients
             idProductoAsociado: idProductoAsociado,
             activo: activo,
             img: imgUrl,
             stock: 9999, // practically infinite
             vistas: 0,
-            tipos: [],
-            extras: [],
+            tipos: _tagsPromoActuales.tipos || [],
+            extras: _tagsPromoActuales.extras || [],
             quitar: []
         };
 
@@ -240,6 +315,8 @@ window.guardarPromoBanner = async () => {
         document.getElementById("promoActivo").checked = true;
         document.getElementById("promoImageUpload").value = "";
         document.getElementById("promoCropperContainer").style.display = "none";
+        window._tagsPromoActuales = { tipos: [], extras: [] };
+        window.renderizarTagsPromo();
         if (promoCropper) {
             promoCropper.destroy();
             promoCropper = null;
