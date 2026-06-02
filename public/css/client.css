@@ -66,18 +66,18 @@
 
 .oferta-bubble {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: 5px;
+    right: 5px;
     background: #d32f2f;
     color: white;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: bold;
-    padding: 8px;
+    padding: 5px;
     border-radius: 50%;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     z-index: 10;
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;

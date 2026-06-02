@@ -197,7 +197,6 @@ window.cargarParaEditar = (idFirebase) => {
     document.getElementById("catAdmin").value = p.categoria || ""; 
     document.getElementById("nombreAdmin").value = p.nombre || ""; 
     document.getElementById("precioAdmin").value = p.precio || ""; 
-    document.getElementById("precioOfertaAdmin").value = p.precioOferta || "";
     document.getElementById("stockAdmin").value = p.stock || ""; 
     document.getElementById("imgAdmin").value = p.img || ""; 
     
