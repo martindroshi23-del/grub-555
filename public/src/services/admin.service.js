@@ -35,11 +35,14 @@ export const guardarProductoEnNube = async () => {
     // Usamos directamente las etiquetas globales de inventory.js
     let tagsAct = window._tagsActuales || { tipos: [], extras: [], quitar: [] };
     
+    let precioOfertaVal = document.getElementById("precioOfertaAdmin") ? parseInt(document.getElementById("precioOfertaAdmin").value) : null;
+
     let p = {
         esBebida: document.getElementById("tipoItemAdmin").value === "bebida", 
         categoria: document.getElementById("catAdmin").value || "Otros",
         nombre: document.getElementById("nombreAdmin").value, 
         precio: parseInt(document.getElementById("precioAdmin").value),
+        precioOferta: isNaN(precioOfertaVal) ? null : (precioOfertaVal || null),
         stock: parseInt(document.getElementById("stockAdmin").value) || 0, 
         img: document.getElementById("imgAdmin").value,
         vistas: idForm ? undefined : 0, 
