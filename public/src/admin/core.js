@@ -1184,26 +1184,42 @@ window.imprimirTicketLocal = (idVenta) => {
                         extraInfo.push(`+ ${val}`);
                     }
                 }
+            } else if (d.modificadores && Array.isArray(d.modificadores)) {
+                d.modificadores.forEach(m => {
+                    if (m.tipo === "A quitar" || m.tipo === "Sin") {
+                        extraInfo.push(`- ${m.nombre}`);
+                    } else {
+                        extraInfo.push(`+ ${m.nombre}`);
+                    }
+                });
             }
 
             productos.push({
                 "Cantidad": d.cantidad || 1,
                 "Nombre": nombreCompleto,
                 "ExtraInfo": extraInfo,
-                "Precio": Number(d.precioFinal * d.cantidad) || Number(d.precio * d.cantidad) || 0
+                "Precio": Number(d.precioFinal * d.cantidad) || Number(d.precio * d.cantidad) || Number(d.subtotal) || 0,
+                "Categoria": d.categoria || ""
             });
         });
     }
 
+    let itemsPrincipales = productos.filter(p => p.Categoria !== "Bebidas");
+    let bebidas = productos.filter(p => p.Categoria === "Bebidas");
+
     // Prepare JSON payload
     const payload = {
-        "NombreNegocio": "GRUB TUCUMÁN",
+        "NombreNegocio": "GRUB",
         "PedidoId": String(v.numeroOrden || 0),
         "Fecha": fechaFormateada,
         "Cliente": v.cliente || "Mostrador",
-        "Productos": productos,
+        "Telefono": v.telefono || "-",
+        "Direccion": v.direccion || "-",
+        "Productos": itemsPrincipales,
+        "Bebidas": bebidas,
         "Total": Number(v.total) || 0,
-        "Envio": Number(v.envio) || 0
+        "Envio": Number(v.envio) || 0,
+        "Pagado": v.pagado || false
     };
 
     // Mostrar el modal
@@ -1216,6 +1232,22 @@ window.imprimirTicketLocal = (idVenta) => {
 
     // Guardar el payload actual en un lugar accesible para el botón
     window._payloadImpresionActual = payload;
+
+    // Direct WebUSB printing if already linked
+    if (!window.chrome || !window.chrome.webview) {
+        if (window._impresoraWebUSBGlobal) {
+            // Automatically click the print button logic
+            document.getElementById('modalImpresion').style.display = 'none';
+            window.mostrarToast('Imprimiendo directamente...', 'success');
+            setTimeout(() => {
+                const btnImprimirWebUSB = document.getElementById('btnImprimirWebUSB');
+                if (btnImprimirWebUSB && btnImprimirWebUSB.onclick) {
+                    btnImprimirWebUSB.onclick();
+                }
+            }, 100);
+            return;
+        }
+    }
 
     // Verificar si la aplicación está conectada usando WebView2
     if (window.chrome && window.chrome.webview) {
@@ -1375,37 +1407,73 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
             buffer.push(LEFT);
             buffer.push(textToEscPos(`Pedido ID: ${window._payloadImpresionActual.PedidoId}`));
             buffer.push(textToEscPos(`Fecha: ${window._payloadImpresionActual.Fecha}`));
-            if (window._payloadImpresionActual.Cliente) {
-                buffer.push(textToEscPos(`Cliente: ${window._payloadImpresionActual.Cliente}`));
-            }
+            buffer.push(textToEscPos('--------------------------------'));
+
+            buffer.push(textToEscPos(`Cliente: ${window._payloadImpresionActual.Cliente || '-'}`));
+            buffer.push(textToEscPos(`Tel: ${window._payloadImpresionActual.Telefono || '-'}`));
+
+            let dirChunks = (window._payloadImpresionActual.Direccion || '-').match(/.{1,32}/g) || [];
+            dirChunks.forEach((chunk, idx) => {
+                if(idx === 0) buffer.push(textToEscPos(`Dir: ${chunk}`));
+                else buffer.push(textToEscPos(`     ${chunk}`));
+            });
 
             buffer.push(textToEscPos('--------------------------------'));
 
-            if (window._payloadImpresionActual.Productos) {
+            if (window._payloadImpresionActual.Productos && window._payloadImpresionActual.Productos.length > 0) {
                 window._payloadImpresionActual.Productos.forEach(p => {
+                    buffer.push(BOLD_ON);
                     let line = `${p.Cantidad}x ${p.Nombre}`;
                     if (line.length > 22) line = line.substring(0, 22);
                     let spaces = 32 - line.length - String(p.Precio).length - 1;
                     if (spaces < 1) spaces = 1;
                     buffer.push(textToEscPos(line + ' '.repeat(spaces) + '$' + p.Precio));
+                    buffer.push(BOLD_OFF);
+
                     if (p.ExtraInfo && p.ExtraInfo.length > 0) {
                         p.ExtraInfo.forEach(info => {
                             let infoLine = `  ${info}`;
                             if (infoLine.length > 32) infoLine = infoLine.substring(0, 32);
+                            if (info.startsWith("- ")) buffer.push(BOLD_ON);
                             buffer.push(textToEscPos(infoLine));
+                            if (info.startsWith("- ")) buffer.push(BOLD_OFF);
                         });
                     }
+                });
+            }
+
+            if (window._payloadImpresionActual.Bebidas && window._payloadImpresionActual.Bebidas.length > 0) {
+                buffer.push(textToEscPos('--------------------------------'));
+                buffer.push(CENTER);
+                buffer.push(textToEscPos('BEBIDAS'));
+                buffer.push(LEFT);
+                window._payloadImpresionActual.Bebidas.forEach(p => {
+                    buffer.push(BOLD_ON);
+                    let line = `${p.Cantidad}x ${p.Nombre}`;
+                    if (line.length > 22) line = line.substring(0, 22);
+                    let spaces = 32 - line.length - String(p.Precio).length - 1;
+                    if (spaces < 1) spaces = 1;
+                    buffer.push(textToEscPos(line + ' '.repeat(spaces) + '$' + p.Precio));
+                    buffer.push(BOLD_OFF);
                 });
             }
 
             buffer.push(textToEscPos('--------------------------------'));
             buffer.push(LEFT);
             if (window._payloadImpresionActual.Envio) {
-                buffer.push(textToEscPos(`Envio: $${window._payloadImpresionActual.Envio}`));
+                buffer.push(textToEscPos(`Costo Envio: $${window._payloadImpresionActual.Envio}`));
             }
             buffer.push(CENTER);
             buffer.push(BOLD_ON);
+            buffer.push(LF);
             buffer.push(textToEscPos(`TOTAL: $${window._payloadImpresionActual.Total}`));
+            buffer.push(LF);
+
+            if (window._payloadImpresionActual.Pagado) {
+                buffer.push(textToEscPos(`PAGADO`));
+            } else {
+                buffer.push(textToEscPos(`NO PAGADO`));
+            }
             buffer.push(BOLD_OFF);
             buffer.push(LF);
             buffer.push(textToEscPos('Gracias por su compra!'));
