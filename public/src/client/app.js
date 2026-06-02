@@ -102,23 +102,35 @@ function mostrarMenu() {
   let categoriasUsadas = [...new Set(principales.map(p => p.categoria || "Otros"))];
   
   // Render Banners first at the very top (no category title)
-  let banners = productos.filter(p => p.esPromoBanner);
+  // Filtrar banners activos
+  let banners = productos.filter(p => p.esPromoBanner && p.activo !== false);
   if (banners.length > 0) {
       let bannerContainer = document.createElement("div");
-      bannerContainer.style.display = "flex";
-      bannerContainer.style.flexDirection = "column";
-      bannerContainer.style.gap = "10px";
-      bannerContainer.style.padding = "10px";
-      bannerContainer.style.marginTop = "10px";
+      // Use CSS grid for responsive columns: 2 columns on tablet/PC, 1 or 2 on mobile depending on size
+      bannerContainer.className = "banner-grid";
 
       banners.forEach(b => {
           let bannerImg = document.createElement("img");
           bannerImg.src = b.img;
           bannerImg.style.width = "100%";
+          bannerImg.style.height = "auto";
+          bannerImg.style.display = "block";
           bannerImg.style.borderRadius = "8px";
           bannerImg.style.cursor = "pointer";
           bannerImg.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
-          bannerImg.onclick = () => window.abrirUIProducto(b);
+
+          bannerImg.onclick = () => {
+              if (b.idProductoAsociado) {
+                  let prodAsociado = productos.find(p => p.id === b.idProductoAsociado);
+                  if (prodAsociado) {
+                      window.abrirUIProducto(prodAsociado);
+                  } else {
+                      window.abrirUIProducto(b);
+                  }
+              } else {
+                  window.abrirUIProducto(b);
+              }
+          };
           bannerContainer.appendChild(bannerImg);
       });
       contenedor.appendChild(bannerContainer);
@@ -200,7 +212,8 @@ function mostrarMenu() {
                             <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
                             <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta}</span>
                         </div>`;
-                    bubbleHtml = `<div class="oferta-bubble">Oferta</div>`;
+                    // Usando estilos inline para asegurar que la burbuja se vea incluso si el CSS principal está cacheado
+                    bubbleHtml = `<div class="oferta-bubble" style="position: absolute; top: 5px; right: 5px; background: #d32f2f; color: white; font-size: 0.65rem; font-weight: bold; padding: 5px; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1; transform-origin: top center; animation: swing 2s infinite ease-in-out;">Oferta</div>`;
                 }
 
                 card.innerHTML = `
@@ -237,7 +250,7 @@ function mostrarMenu() {
                         <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
                         <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta}</span>
                     </div>`;
-                bubbleHtml = `<div class="oferta-bubble">Oferta</div>`;
+                bubbleHtml = `<div class="oferta-bubble" style="position: absolute; top: 5px; right: 5px; background: #d32f2f; color: white; font-size: 0.65rem; font-weight: bold; padding: 5px; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1; transform-origin: top center; animation: swing 2s infinite ease-in-out;">Oferta</div>`;
             }
 
             card.innerHTML = `

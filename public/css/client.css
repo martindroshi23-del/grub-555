@@ -100,3 +100,19 @@
     position: relative;
     overflow: visible; /* To allow bubble to overlap */
 }
+
+.banner-grid {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 480px) {
+    .banner-grid {
+        /* Permite que en móviles muy pequeños se vean uno o dos dependiendo de cómo quede mejor,
+           la instrucción dice "En móviles, mostrar dos banners por fila siempre que el espacio lo permita. En pantallas muy pequeñas, permitir un banner por fila" */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+}

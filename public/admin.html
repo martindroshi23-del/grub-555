@@ -1394,6 +1394,15 @@
                 <input type="hidden" id="promoImgUrl">
                 <input type="text" id="promoNombre" placeholder="Nombre interno de la Promo" class="input-base">
                 <input type="number" id="promoPrecio" placeholder="Precio ($)" class="input-base">
+                <input type="text" id="promoDescripcion" placeholder="Descripción (opcional)" class="input-base">
+                <label style="color: #888; font-size: 0.9em; margin-bottom: -5px;">Producto Asociado:</label>
+                <select id="promoSelectProducto" class="input-base" style="margin-bottom: 0;">
+                  <option value="">Selecciona un producto...</option>
+                </select>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                    <input type="checkbox" id="promoActivo" checked style="width: auto;">
+                    <label for="promoActivo" style="color: white; font-size: 0.95em;">Banner Activo</label>
+                </div>
                 <button class="btn-primary" onclick="window.guardarPromoBanner()" id="btnGuardarPromoBanner">Crear Banner Promocional</button>
               </div>
 
