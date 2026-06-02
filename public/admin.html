@@ -70,6 +70,23 @@
 
       <button
         class="sidebar-btn"
+        data-tooltip="Promos y Ofertas"
+        onclick="cambiarTab('tab-promos', this)"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </button>
+
+      <button
+        class="sidebar-btn"
         data-tooltip="Inventario Nube"
         onclick="cambiarTab('tab-inventario', this)"
       >
@@ -1104,11 +1121,6 @@
                   placeholder="Precio Base"
                 />
                 <input
-                  id="precioOfertaAdmin"
-                  type="number"
-                  placeholder="Precio Oferta (opcional)"
-                />
-                <input
                   id="stockAdmin"
                   type="number"
                   placeholder="Stock Inicial"
@@ -1358,6 +1370,63 @@
                   <input type="text" id="config-whatsapp-number" placeholder="Ej: 5491123456789" style="flex: 1;" />
                   <button class="btn-primary" onclick="guardarConfigWhatsApp()" style="width: auto; padding: 10px 20px;">Guardar Configuración</button>
               </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-promos" class="tab-content">
+        <div class="admin-card" style="max-width: 1000px; margin: 0 auto">
+          <h2 style="color: var(--primary); margin-bottom: 20px;">🔥 Centro de Promociones y Ofertas</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+            <!-- SECCIÓN 1: PROMOS EN IMAGEN -->
+            <div class="card" style="padding: 20px; background: #1a1a1a; border-radius: 8px;">
+              <h3>Promos en Imagen (Banners)</h3>
+              <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">
+                Sube una imagen ancha (recomendado 2:1, ej: 800x400). Aparecerá en la parte superior del menú como un botón gigante clickeable. Funciona como un producto especial.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="file" id="promoImageUpload" accept="image/*" style="background: #2a2a2a; color: white; padding: 10px; border-radius: 5px;">
+                <div id="promoUploadStatus" style="font-size: 0.85em;"></div>
+                <div id="promoCropperContainer" style="width: 100%; max-height: 300px; display: none; margin-bottom: 10px;">
+                    <img id="promoCropperImage" style="max-width: 100%;">
+                </div>
+                <input type="hidden" id="promoImgUrl">
+                <input type="text" id="promoNombre" placeholder="Nombre interno de la Promo" class="input-base">
+                <input type="number" id="promoPrecio" placeholder="Precio ($)" class="input-base">
+                <button class="btn-primary" onclick="window.guardarPromoBanner()" id="btnGuardarPromoBanner">Crear Banner Promocional</button>
+              </div>
+
+              <h4 style="margin-top: 20px; margin-bottom: 10px; color: #aaa;">Banners Activos</h4>
+              <div id="listaBannersActivos" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Banners rendered here -->
+              </div>
+            </div>
+
+            <!-- SECCIÓN 2: OFERTAS EN PRODUCTOS -->
+            <div class="card" style="padding: 20px; background: #1a1a1a; border-radius: 8px;">
+              <h3>Ofertas en Productos (Burbuja)</h3>
+              <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">
+                Aplica un precio de oferta a un producto existente en tu base de datos. Se mostrará una pequeña burbuja de "Oferta".
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <select id="ofertaSelectProducto" class="input-base" style="margin-bottom: 0;">
+                  <option value="">Selecciona un producto...</option>
+                  <!-- Populated dynamically -->
+                </select>
+                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px; margin-bottom: 10px;">
+                  <span style="color: #888; font-size: 0.9em;">Precio actual: </span><span id="ofertaPrecioActual" style="font-weight: bold; color: #fff;">$0</span>
+                </div>
+                <input type="number" id="ofertaPrecioNuevo" placeholder="Nuevo Precio de Oferta ($)" class="input-base">
+                <button class="btn-primary" onclick="window.aplicarOfertaProducto()">Aplicar Oferta</button>
+              </div>
+
+              <h4 style="margin-top: 20px; margin-bottom: 10px; color: #aaa;">Ofertas Activas</h4>
+              <div id="listaOfertasActivas" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Offers rendered here -->
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1902,6 +1971,7 @@
 
     <div id="toast-alerta"></div>
 
+    <script type="module" src="src/admin/promos.js"></script>
     <script type="module" src="src/admin/app.js"></script>
   </body>
 </html>

@@ -98,39 +98,55 @@ function mostrarMenu() {
       }
   }
 
-  let principales = productos.filter(p => !p.esBebida);
+  let principales = productos.filter(p => !p.esBebida && !p.esPromoBanner);
   let categoriasUsadas = [...new Set(principales.map(p => p.categoria || "Otros"))];
   
-  // Mover "Promos" o "Promociones" al inicio si existe
-  categoriasUsadas.sort((a, b) => {
-      let aLow = a.toLowerCase();
-      let bLow = b.toLowerCase();
-      if (aLow.includes('promo')) return -1;
-      if (bLow.includes('promo')) return 1;
-      return 0;
-  });
+  // Render Banners first at the very top (no category title)
+  let banners = productos.filter(p => p.esPromoBanner);
+  if (banners.length > 0) {
+      let bannerContainer = document.createElement("div");
+      bannerContainer.style.display = "flex";
+      bannerContainer.style.flexDirection = "column";
+      bannerContainer.style.gap = "10px";
+      bannerContainer.style.padding = "10px";
+      bannerContainer.style.marginTop = "10px";
 
-      let qlHtml = `<span class="quick-links-title">¿Qué buscas?</span>`;
-      categoriasUsadas.forEach(cat => {
-        let emoji = cat.toLowerCase().includes('pizza') ? '🍕' : (cat.toLowerCase().includes('hamburguesa') ? '🍔' : (cat.toLowerCase().includes('promo') ? '🔥' : '🍽️'));
-        qlHtml += `<a href="#cat-${cat.replace(/\s+/g, '-')}" class="quick-link-btn">${emoji} ${cat}</a>`;
+      banners.forEach(b => {
+          let bannerImg = document.createElement("img");
+          bannerImg.src = b.img;
+          bannerImg.style.width = "100%";
+          bannerImg.style.borderRadius = "8px";
+          bannerImg.style.cursor = "pointer";
+          bannerImg.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
+          bannerImg.onclick = () => window.abrirUIProducto(b);
+          bannerContainer.appendChild(bannerImg);
       });
-      document.getElementById("quickLinks").innerHTML = qlHtml;
-      
-      categoriasUsadas.forEach(cat => {
-        let titulo = document.createElement("h2"); 
-        let esPromo = cat.toLowerCase().includes('promo');
+      contenedor.appendChild(bannerContainer);
+  }
 
-        titulo.className = esPromo ? "seccion-titulo promo-titulo" : "seccion-titulo";
-        titulo.id = "cat-" + cat.replace(/\s+/g, '-');
+  // Remove "Promos" from normal categories since banners handle them, but if they want "Ofertas" in quick links
+  let qlHtml = `<span class="quick-links-title">¿Qué buscas?</span>`;
+  if (banners.length > 0 || productos.some(p => p.precioOferta)) {
+      qlHtml += `<a href="#" class="quick-link-btn" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">🔥 Ofertas</a>`;
+  }
 
-        if (esPromo && !cat.toLowerCase().includes('imperdibles')) {
-            titulo.innerHTML = `🔥 ¡${cat.toUpperCase()} IMPERDIBLES! 🔥`;
-        } else {
-            titulo.innerText = cat;
-        }
+  categoriasUsadas.forEach(cat => {
+    let emoji = cat.toLowerCase().includes('pizza') ? '🍕' : (cat.toLowerCase().includes('hamburguesa') ? '🍔' : '🍽️');
+    if (cat.toLowerCase() !== 'promociones' && cat.toLowerCase() !== 'promos') {
+        qlHtml += `<a href="#cat-${cat.replace(/\s+/g, '-')}" class="quick-link-btn">${emoji} ${cat}</a>`;
+    }
+  });
+  document.getElementById("quickLinks").innerHTML = qlHtml;
 
-        contenedor.appendChild(titulo);
+  categoriasUsadas.forEach(cat => {
+    if (cat.toLowerCase() === 'promociones' || cat.toLowerCase() === 'promos') return; // Skip rendering standard category for promos if we use banners
+
+    let titulo = document.createElement("h2");
+    titulo.className = "seccion-titulo";
+    titulo.id = "cat-" + cat.replace(/\s+/g, '-');
+    titulo.innerText = cat;
+
+    contenedor.appendChild(titulo);
   
         let grid = document.createElement("div"); 
         grid.className = "grid";
@@ -182,9 +198,9 @@ function mostrarMenu() {
                     precioHtml = `
                         <div class="card-precio" style="display: flex; flex-direction: column; align-items: center; line-height: 1.2; margin-bottom: 5px;">
                             <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
-                            <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta} <span style="font-size: 0.7em;">OFERTA</span></span>
+                            <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta}</span>
                         </div>`;
-                    bubbleHtml = `<div class="oferta-bubble">¡OFERTA!</div>`;
+                    bubbleHtml = `<div class="oferta-bubble">Oferta</div>`;
                 }
 
                 card.innerHTML = `
@@ -219,9 +235,9 @@ function mostrarMenu() {
                 precioHtml = `
                     <div class="card-precio" style="display: flex; flex-direction: column; align-items: center; line-height: 1.2; margin-bottom: 5px;">
                         <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
-                        <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta} <span style="font-size: 0.7em;">OFERTA</span></span>
+                        <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta}</span>
                     </div>`;
-                bubbleHtml = `<div class="oferta-bubble">¡OFERTA!</div>`;
+                bubbleHtml = `<div class="oferta-bubble">Oferta</div>`;
             }
 
             card.innerHTML = `
@@ -288,7 +304,7 @@ window.abrirUIProducto = async (producto) => {
 
 function renderizarOpcionesProducto() {
   let ui = document.getElementById("uiProducto");
-  let precioBaseOriginal = productoActual.precio;
+  let precioBaseOriginal = productoActual.precioOferta ? productoActual.precioOferta : productoActual.precio;
   let precioCalculado = precioBaseOriginal;
 
   if (seleccionActual.tipo && seleccionActual.tipo.precio) precioCalculado += seleccionActual.tipo.precio;
@@ -413,7 +429,7 @@ window.confirmarAgregado = () => {
   seleccionActual.quitar.forEach(q => notas.push(`Sin ${q.nombre}`));
   seleccionActual.bebidas.forEach(b => notas.push(`Con ${b.cantidad}x ${b.nombre}`));
   
-  let precioFinal = productoActual.precio;
+  let precioFinal = productoActual.precioOferta ? productoActual.precioOferta : productoActual.precio;
   if (seleccionActual.tipo && seleccionActual.tipo.precio) precioFinal += seleccionActual.tipo.precio;
   seleccionActual.extras.forEach(e => precioFinal += e.precio);
   seleccionActual.quitar.forEach(q => { if(q.precio) precioFinal += q.precio; });

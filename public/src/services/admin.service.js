@@ -35,14 +35,16 @@ export const guardarProductoEnNube = async () => {
     // Usamos directamente las etiquetas globales de inventory.js
     let tagsAct = window._tagsActuales || { tipos: [], extras: [], quitar: [] };
     
-    let precioOfertaVal = document.getElementById("precioOfertaAdmin") ? parseInt(document.getElementById("precioOfertaAdmin").value) : null;
+    // Si editId está establecido pero NO estamos modificando precioOferta (porque se maneja en promos tab),
+    // debemos preservar el precioOferta actual si existe. Lo más fácil es no tocarlo si no viene en el form.
+    // Como ya lo quitamos del form, simplemente no lo enviamos aquí, y updateDoc usará merge por defecto si no lo pisamos (pero updateDoc reemplaza campos definidos).
+    // Para simplificar, omitimos precioOferta aquí y dependemos de otra función para actualizarlo.
 
     let p = {
         esBebida: document.getElementById("tipoItemAdmin").value === "bebida", 
         categoria: document.getElementById("catAdmin").value || "Otros",
         nombre: document.getElementById("nombreAdmin").value, 
         precio: parseInt(document.getElementById("precioAdmin").value),
-        precioOferta: isNaN(precioOfertaVal) ? null : (precioOfertaVal || null),
         stock: parseInt(document.getElementById("stockAdmin").value) || 0, 
         img: document.getElementById("imgAdmin").value,
         vistas: idForm ? undefined : 0, 
