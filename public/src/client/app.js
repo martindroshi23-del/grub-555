@@ -101,18 +101,35 @@ function mostrarMenu() {
   let principales = productos.filter(p => !p.esBebida);
   let categoriasUsadas = [...new Set(principales.map(p => p.categoria || "Otros"))];
   
+  // Mover "Promos" o "Promociones" al inicio si existe
+  categoriasUsadas.sort((a, b) => {
+      let aLow = a.toLowerCase();
+      let bLow = b.toLowerCase();
+      if (aLow.includes('promo')) return -1;
+      if (bLow.includes('promo')) return 1;
+      return 0;
+  });
+
       let qlHtml = `<span class="quick-links-title">¿Qué buscas?</span>`;
       categoriasUsadas.forEach(cat => {
-        let emoji = cat.toLowerCase().includes('pizza') ? '🍕' : (cat.toLowerCase().includes('hamburguesa') ? '🍔' : '🍽️');
-        qlHtml += `<a href="#cat-${cat}" class="quick-link-btn">${emoji} ${cat}</a>`;
+        let emoji = cat.toLowerCase().includes('pizza') ? '🍕' : (cat.toLowerCase().includes('hamburguesa') ? '🍔' : (cat.toLowerCase().includes('promo') ? '🔥' : '🍽️'));
+        qlHtml += `<a href="#cat-${cat.replace(/\s+/g, '-')}" class="quick-link-btn">${emoji} ${cat}</a>`;
       });
       document.getElementById("quickLinks").innerHTML = qlHtml;
       
       categoriasUsadas.forEach(cat => {
         let titulo = document.createElement("h2"); 
-        titulo.className = "seccion-titulo"; 
-        titulo.id = "cat-" + cat; 
-        titulo.innerText = cat;
+        let esPromo = cat.toLowerCase().includes('promo');
+
+        titulo.className = esPromo ? "seccion-titulo promo-titulo" : "seccion-titulo";
+        titulo.id = "cat-" + cat.replace(/\s+/g, '-');
+
+        if (esPromo && !cat.toLowerCase().includes('imperdibles')) {
+            titulo.innerHTML = `🔥 ¡${cat.toUpperCase()} IMPERDIBLES! 🔥`;
+        } else {
+            titulo.innerText = cat;
+        }
+
         contenedor.appendChild(titulo);
   
         let grid = document.createElement("div"); 
@@ -159,11 +176,22 @@ function mostrarMenu() {
                     ? `<video muted loop playsinline class="video-menu" src="${imgUrl}"></video>`
                     : `<img src="${imgUrl}" alt="${p.nombre}">`;
                 
+                let precioHtml = `<div class="card-precio">$${p.precio}</div>`;
+                let bubbleHtml = '';
+                if (p.precioOferta && p.precioOferta < p.precio) {
+                    precioHtml = `
+                        <div class="card-precio" style="display: flex; flex-direction: column; align-items: center; line-height: 1.2; margin-bottom: 5px;">
+                            <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
+                            <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta} <span style="font-size: 0.7em;">OFERTA</span></span>
+                        </div>`;
+                    bubbleHtml = `<div class="oferta-bubble">¡OFERTA!</div>`;
+                }
+
                 card.innerHTML = `
-                  <div class="img-container">${mediaElement}${agotado ? '<div class="overlay-agotado">AGOTADO</div>' : ''}</div>
+                  <div class="img-container">${mediaElement}${agotado ? '<div class="overlay-agotado">AGOTADO</div>' : ''}${bubbleHtml}</div>
                   <div class="card-info">
                     <div class="card-nombre">${p.nombre}</div>
-                    <div class="card-precio">$${p.precio}</div>
+                    ${precioHtml}
                     <button class="btn-agregar" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Pedir'}</button>
                   </div>`;
                 if (!agotado) card.onclick = () => window.abrirUIProducto(p);
@@ -185,11 +213,22 @@ function mostrarMenu() {
                 ? `<video muted loop playsinline class="video-menu" src="${imgUrl}"></video>`
                 : `<img src="${imgUrl}" alt="${p.nombre}">`;
 
+            let precioHtml = `<div class="card-precio">$${p.precio}</div>`;
+            let bubbleHtml = '';
+            if (p.precioOferta && p.precioOferta < p.precio) {
+                precioHtml = `
+                    <div class="card-precio" style="display: flex; flex-direction: column; align-items: center; line-height: 1.2; margin-bottom: 5px;">
+                        <span style="text-decoration: line-through; color: #888; font-size: 0.9em;">$${p.precio}</span>
+                        <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">$${p.precioOferta} <span style="font-size: 0.7em;">OFERTA</span></span>
+                    </div>`;
+                bubbleHtml = `<div class="oferta-bubble">¡OFERTA!</div>`;
+            }
+
             card.innerHTML = `
-              <div class="img-container">${mediaElement}${agotado ? '<div class="overlay-agotado">AGOTADO</div>' : ''}</div>
+              <div class="img-container">${mediaElement}${agotado ? '<div class="overlay-agotado">AGOTADO</div>' : ''}${bubbleHtml}</div>
               <div class="card-info">
                 <div class="card-nombre">${p.nombre}</div>
-                <div class="card-precio">$${p.precio}</div>
+                ${precioHtml}
                 <button class="btn-agregar" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Pedir'}</button>
               </div>`;
             if (!agotado) card.onclick = () => window.abrirUIProducto(p);

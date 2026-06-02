@@ -1,7 +1,13 @@
 import { guardarProductoEnNube, modificarStockNube, borrarDeNube } from "../services/admin.service.js";
 
 // MANEJO DE CATEGORIAS
-let categoriasGuardadas = JSON.parse(localStorage.getItem("grub_categorias")) || ["Pizzas", "Hamburguesas", "Bebidas", "Acompañamientos"];
+let categoriasGuardadas = JSON.parse(localStorage.getItem("grub_categorias")) || ["Pizzas", "Hamburguesas", "Bebidas", "Acompañamientos", "Promociones"];
+
+// Asegurarse de que "Promociones" esté en la lista por defecto
+if (!categoriasGuardadas.includes("Promociones")) {
+    categoriasGuardadas.push("Promociones");
+    localStorage.setItem("grub_categorias", JSON.stringify(categoriasGuardadas));
+}
 
 function actualizarSelectCategorias() {
     let select = document.getElementById("catAdmin"); 
@@ -191,6 +197,7 @@ window.cargarParaEditar = (idFirebase) => {
     document.getElementById("catAdmin").value = p.categoria || ""; 
     document.getElementById("nombreAdmin").value = p.nombre || ""; 
     document.getElementById("precioAdmin").value = p.precio || ""; 
+    document.getElementById("precioOfertaAdmin").value = p.precioOferta || "";
     document.getElementById("stockAdmin").value = p.stock || ""; 
     document.getElementById("imgAdmin").value = p.img || ""; 
     
