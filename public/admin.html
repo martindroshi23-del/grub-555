@@ -1395,6 +1395,27 @@
                 <input type="text" id="promoNombre" placeholder="Nombre interno de la Promo" class="input-base">
                 <input type="number" id="promoPrecio" placeholder="Precio ($)" class="input-base">
                 <input type="text" id="promoDescripcion" placeholder="Descripción (opcional)" class="input-base">
+
+                <div class="opciones-tags-container" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px;">
+                  <!-- Tipos Promo -->
+                  <div class="tag-group" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                      <strong style="color: #4CAF50; font-size: 0.9em;">Tipos / Tamaños</strong>
+                      <button id="btnAgregarTipoPromo" type="button" class="btn-primary" style="padding: 5px 10px; font-size: 0.8em; border-radius: 4px;" onclick="window.abrirModalEtiquetaPromo('tipos')">+ Agregar</button>
+                    </div>
+                    <div id="tagsTiposPromo" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                  </div>
+
+                  <!-- Extras Promo -->
+                  <div class="tag-group" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                      <strong style="color: #ff9800; font-size: 0.9em;">Adicionales / Extras</strong>
+                      <button id="btnAgregarExtraPromo" type="button" class="btn-primary" style="padding: 5px 10px; font-size: 0.8em; border-radius: 4px; background: #ff9800; color: #111;" onclick="window.abrirModalEtiquetaPromo('extras')">+ Agregar</button>
+                    </div>
+                    <div id="tagsExtrasPromo" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                  </div>
+                </div>
+
                 <label style="color: #888; font-size: 0.9em; margin-bottom: -5px;">Producto Asociado:</label>
                 <select id="promoSelectProducto" class="input-base" style="margin-bottom: 0;">
                   <option value="">Selecciona un producto...</option>
@@ -1984,3 +2005,26 @@
     <script type="module" src="src/admin/app.js"></script>
   </body>
 </html>
+    <!-- Modal Etiqueta Opciones Promo -->
+    <div id="modalEtiquetaPromo" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px;">
+        <button class="btn-cerrar-modal" onclick="document.getElementById('modalEtiquetaPromo').style.display = 'none'">&times;</button>
+        <h2 id="tituloModalEtiquetaPromo" style="margin-bottom: 15px;">Agregar Etiqueta Promo</h2>
+
+        <input type="hidden" id="tagModalCategoriaPromo" />
+        <input type="hidden" id="tagModalIndexPromo" />
+
+        <div class="form-group">
+          <label>Nombre de la opción:</label>
+          <input id="tagModalNombrePromo" class="form-control" type="text" placeholder="Ej: Simple, Cheddar" style="text-transform: capitalize;" />
+        </div>
+
+        <div class="form-group">
+          <label>Precio adicional ($):</label>
+          <input id="tagModalPrecioPromo" class="form-control" type="number" placeholder="Ej: 500 (0 si es gratis)" value="0" />
+          <p style="font-size: 0.85em; color: #888; margin-top: 5px;">Nota: Si es "A quitar", el precio suele ser 0. Si se descuenta, usa un valor negativo (ej: -200).</p>
+        </div>
+
+        <button class="btn-primary" onclick="window.guardarEtiquetaPromo()" style="width: 100%; margin-top: 15px;">Guardar Etiqueta</button>
+      </div>
+    </div>
