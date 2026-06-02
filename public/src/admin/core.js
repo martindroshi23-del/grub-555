@@ -1501,9 +1501,7 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
             }
             buffer.push(CENTER);
             buffer.push(BOLD_ON);
-            buffer.push(LF);
             buffer.push(textToEscPos(`TOTAL: $${window._payloadImpresionActual.Total}`));
-            buffer.push(LF);
 
             if (window._payloadImpresionActual.Pagado) {
                 buffer.push(textToEscPos(`PAGADO`));
@@ -1511,12 +1509,11 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
                 buffer.push(textToEscPos(`NO PAGADO`));
             }
             buffer.push(BOLD_OFF);
-            buffer.push(LF);
             buffer.push(CENTER);
             buffer.push(textToEscPos('Gracias por su compra!'));
-            buffer.push(LF);
 
             if (window._payloadImpresionActual.PDPuntos !== undefined && window._payloadImpresionActual.PDPuntos > 0) {
+                buffer.push(LF);
                 buffer.push(textToEscPos('--------------------------------'));
                 buffer.push(textToEscPos(`Hasta ahora tienes ${window._payloadImpresionActual.PDPuntos} puntos`));
                 let puntosStr = "[X]".repeat(window._payloadImpresionActual.PDPuntos) + "[ ]".repeat(10 - window._payloadImpresionActual.PDPuntos);
@@ -1525,7 +1522,6 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
                 buffer.push(textToEscPos('--------------------------------'));
             }
 
-            buffer.push(LF);
             buffer.push(textToEscPos('Documento no valido como factura'));
             buffer.push(LF);
             buffer.push(LF);

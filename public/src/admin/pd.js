@@ -74,7 +74,7 @@ window.vaciarDatosPD = async () => {
 
         window.pdClientesGlobal.forEach(c => {
             if (c.puntos > 0) {
-                let ref = doc(db, "clientes", c.id);
+                let ref = doc(db, "pd_clientes", c.id);
                 batch.update(ref, { puntos: 0 });
                 docsCount++;
             }
