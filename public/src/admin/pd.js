@@ -1,3 +1,6 @@
+import { doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { db } from "../config/firebase.config.js";
+
 window.renderizarTablaPD = function() {
 
         try {
@@ -54,3 +57,39 @@ window.renderizarTablaPD = function() {
             if(ui) ui.innerHTML = `<p style="color:#ff3c3c;">Error al cargar datos del programa de descuentos.</p>`;
         }
     }
+
+window.vaciarDatosPD = async () => {
+    let passcode = prompt("ADVERTENCIA: Vas a eliminar todos los registros del programa de descuentos (clientes, puntos, etc). Escribe 'BORRAR' para confirmar.");
+    if (passcode !== "BORRAR") {
+        window.mostrarToast("Acción cancelada.", "error");
+        return;
+    }
+
+    try {
+        window.mostrarToast("Eliminando datos, por favor espera...", "success");
+        // Using batch or looping to delete all docs in 'clientes_pd' (assuming it's a collection or subcollection)
+        // From looking at how data is fetched, let's look for how `window.pdClientesGlobal` is populated
+        // Normally it's from 'clientes' collection. We need to reset their `puntos` to 0 or delete the docs.
+
+        let batch = writeBatch(db);
+        let docsCount = 0;
+
+        window.pdClientesGlobal.forEach(c => {
+            if (c.puntos > 0) {
+                let ref = doc(db, "clientes", c.id);
+                batch.update(ref, { puntos: 0 });
+                docsCount++;
+            }
+        });
+
+        if (docsCount > 0) {
+            await batch.commit();
+            window.mostrarToast(`Se resetearon los puntos de ${docsCount} clientes.`, "success");
+        } else {
+            window.mostrarToast("No había datos que resetear.", "success");
+        }
+    } catch (e) {
+        console.error("Error vaciando PD:", e);
+        window.mostrarToast("Error al vaciar los datos.", "error");
+    }
+};

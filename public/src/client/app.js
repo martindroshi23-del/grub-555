@@ -101,6 +101,26 @@ function mostrarMenu() {
   let principales = productos.filter(p => !p.esBebida && !p.esPromoBanner);
   let categoriasUsadas = [...new Set(principales.map(p => p.categoria || "Otros"))];
   
+  // Hardcode priority sorting: Hamburguesas first, Pizzas second, others later
+  categoriasUsadas.sort((a, b) => {
+      let aLow = a.toLowerCase();
+      let bLow = b.toLowerCase();
+
+      let getScore = (name) => {
+          if (name.includes('hamburguesa')) return 1;
+          if (name.includes('pizza')) return 2;
+          return 3;
+      };
+
+      let scoreA = getScore(aLow);
+      let scoreB = getScore(bLow);
+
+      if (scoreA !== scoreB) {
+          return scoreA - scoreB;
+      }
+      return a.localeCompare(b);
+  });
+
   // Render Banners first at the very top (no category title)
   // Filtrar banners activos
   let banners = productos.filter(p => p.esPromoBanner && p.activo !== false);
@@ -126,7 +146,7 @@ function mostrarMenu() {
   }
 
   // Remove "Promos" from normal categories since banners handle them, but if they want "Ofertas" in quick links
-  let qlHtml = `<span class="quick-links-title">¿Qué buscas?</span>`;
+  let qlHtml = ``;
   if (banners.length > 0 || productos.some(p => p.precioOferta)) {
       qlHtml += `<a href="#" class="quick-link-btn" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">🔥 Ofertas</a>`;
   }
