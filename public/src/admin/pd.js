@@ -59,9 +59,7 @@ window.renderizarTablaPD = function() {
     }
 
 window.vaciarDatosPD = async () => {
-    let passcode = prompt("ADVERTENCIA: Vas a eliminar todos los registros del programa de descuentos (clientes, puntos, etc). Escribe 'BORRAR' para confirmar.");
-    if (passcode !== "BORRAR") {
-        window.mostrarToast("Acción cancelada.", "error");
+    if (!confirm("ADVERTENCIA: ¿Estás seguro que deseas reiniciar todos los puntos del programa de descuentos a cero?")) {
         return;
     }
 
