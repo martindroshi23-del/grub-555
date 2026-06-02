@@ -1173,23 +1173,45 @@ window.imprimirTicketLocal = (idVenta) => {
     let productos = [];
     if (v.detalle && Array.isArray(v.detalle)) {
         v.detalle.forEach(d => {
-            let nombreCompleto = d.nombreBase || '';
+            let nombreCompleto = d.nombreBase || d.nombre || '';
             let extraInfo = [];
-            if (d.desglose) {
+
+            // Support for newer string array 'notas'
+            if (d.notas && Array.isArray(d.notas)) {
+                d.notas.forEach(nota => {
+                    if (typeof nota === 'string') {
+                        if (nota.toLowerCase().startsWith('sin ')) {
+                            extraInfo.push(`- ${nota.substring(4)}`);
+                        } else if (nota.startsWith('+ ')) {
+                            extraInfo.push(nota);
+                        } else {
+                            extraInfo.push(`+ ${nota}`);
+                        }
+                    }
+                });
+            }
+            // Support for legacy object 'desglose'
+            else if (d.desglose) {
                 for (let key in d.desglose) {
                     let val = d.desglose[key];
-                    if (key === 'A quitar' || key === 'Sin') {
-                        extraInfo.push(`- ${val}`);
-                    } else {
-                        extraInfo.push(`+ ${val}`);
+                    if (typeof val === 'string') {
+                        if (key === 'A quitar' || key === 'Sin') {
+                            extraInfo.push(`- ${val}`);
+                        } else {
+                            extraInfo.push(`+ ${val}`);
+                        }
                     }
                 }
-            } else if (d.modificadores && Array.isArray(d.modificadores)) {
+            }
+            // Support for specific 'modificadores' array
+            else if (d.modificadores && Array.isArray(d.modificadores)) {
                 d.modificadores.forEach(m => {
-                    if (m.tipo === "A quitar" || m.tipo === "Sin") {
-                        extraInfo.push(`- ${m.nombre}`);
-                    } else {
-                        extraInfo.push(`+ ${m.nombre}`);
+                    if (typeof m.nombre === 'string') {
+                        if (m.tipo === "A quitar" || m.tipo === "Sin") {
+                            extraInfo.push(`- ${m.nombre}`);
+                        } else {
+                            extraInfo.push(`+ ${m.nombre}`);
+                        }
                     }
                 });
             }
@@ -1207,6 +1229,14 @@ window.imprimirTicketLocal = (idVenta) => {
     let itemsPrincipales = productos.filter(p => p.Categoria !== "Bebidas");
     let bebidas = productos.filter(p => p.Categoria === "Bebidas");
 
+    let pdPuntos = 0;
+    if (v.telefono && window.pdClientesGlobal) {
+        let cliente = window.pdClientesGlobal.find(c => c.telefono === v.telefono || c.telefono === v.telefono.replace(/\s+/g, ''));
+        if (cliente) {
+            pdPuntos = cliente.puntos || 0;
+        }
+    }
+
     // Prepare JSON payload
     const payload = {
         "NombreNegocio": "GRUB",
@@ -1215,11 +1245,13 @@ window.imprimirTicketLocal = (idVenta) => {
         "Cliente": v.cliente || "Mostrador",
         "Telefono": v.telefono || "-",
         "Direccion": v.direccion || "-",
+        "NotaGlobal": v.nota || v.notas || "",
         "Productos": itemsPrincipales,
         "Bebidas": bebidas,
         "Total": Number(v.total) || 0,
         "Envio": Number(v.envio) || 0,
-        "Pagado": v.pagado || false
+        "Pagado": v.pagado || false,
+        "PDPuntos": pdPuntos
     };
 
     // Mostrar el modal
@@ -1418,6 +1450,10 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
                 else buffer.push(textToEscPos(`     ${chunk}`));
             });
 
+            if (window._payloadImpresionActual.NotaGlobal && window._payloadImpresionActual.NotaGlobal.trim() !== '') {
+                buffer.push(textToEscPos(`Notas: ${window._payloadImpresionActual.NotaGlobal}`));
+            }
+
             buffer.push(textToEscPos('--------------------------------'));
 
             if (window._payloadImpresionActual.Productos && window._payloadImpresionActual.Productos.length > 0) {
@@ -1476,7 +1512,21 @@ function setupWebUSBLogic(btnVincularId, btnImprimirId, infoId, nombreId) {
             }
             buffer.push(BOLD_OFF);
             buffer.push(LF);
+            buffer.push(CENTER);
             buffer.push(textToEscPos('Gracias por su compra!'));
+            buffer.push(LF);
+
+            if (window._payloadImpresionActual.PDPuntos !== undefined && window._payloadImpresionActual.PDPuntos > 0) {
+                buffer.push(textToEscPos('--------------------------------'));
+                buffer.push(textToEscPos(`Hasta ahora tienes ${window._payloadImpresionActual.PDPuntos} puntos`));
+                let puntosStr = "[X]".repeat(window._payloadImpresionActual.PDPuntos) + "[ ]".repeat(10 - window._payloadImpresionActual.PDPuntos);
+                buffer.push(textToEscPos(puntosStr));
+                buffer.push(textToEscPos('Compra mas para ganar un premio'));
+                buffer.push(textToEscPos('--------------------------------'));
+            }
+
+            buffer.push(LF);
+            buffer.push(textToEscPos('Documento no valido como factura'));
             buffer.push(LF);
             buffer.push(LF);
             buffer.push(LF);

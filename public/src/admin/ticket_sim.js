@@ -47,6 +47,14 @@ window.renderTicketSimulador = () => {
     document.getElementById("ticket-cliente-tel").innerHTML = `<strong>Tel:</strong> ${v.telefono || '-'}`;
     document.getElementById("ticket-cliente-dir").innerHTML = `<strong>Dir:</strong> ${v.direccion || '-'}`;
 
+    let notaEl = document.getElementById("ticket-cliente-nota");
+    if (v.nota || v.notas) {
+        notaEl.innerHTML = `<strong>Nota:</strong> ${v.nota || v.notas}`;
+        notaEl.style.display = "block";
+    } else {
+        notaEl.style.display = "none";
+    }
+
     document.getElementById("ticket-costo-envio").innerText = `$${v.envio || 0}`;
     document.getElementById("ticket-total").innerText = `$${v.total || 0}`;
 
@@ -121,4 +129,26 @@ window.renderTicketSimulador = () => {
         `;
     });
     document.getElementById("ticket-bebidas-list").innerHTML = htmlBebidas || "<div style='text-align:center;'>No hay bebidas</div>";
+
+    // Puntos PD
+    let pdEl = document.getElementById("ticket-pd-info");
+    let pdPuntos = 0;
+    if (v.telefono && window.pdClientesGlobal) {
+        let cliente = window.pdClientesGlobal.find(c => c.telefono === v.telefono || c.telefono === v.telefono.replace(/\s+/g, ''));
+        if (cliente) {
+            pdPuntos = cliente.puntos || 0;
+        }
+    }
+
+    if (pdPuntos > 0) {
+        pdEl.style.display = "block";
+        let cuadritos = "🔳".repeat(pdPuntos) + "⬜".repeat(10 - pdPuntos);
+        pdEl.innerHTML = `
+            <div style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px;">Hasta ahora tienes ${pdPuntos} puntos</div>
+            <div style="letter-spacing: 2px; margin-bottom: 5px; font-size: 1.1em;">${cuadritos}</div>
+            <div style="font-size: 0.8em;">Compra más para ganar un premio</div>
+        `;
+    } else {
+        pdEl.style.display = "none";
+    }
 };
