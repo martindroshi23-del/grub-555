@@ -119,18 +119,7 @@ function mostrarMenu() {
           bannerImg.style.cursor = "pointer";
           bannerImg.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
 
-          bannerImg.onclick = () => {
-              if (b.idProductoAsociado) {
-                  let prodAsociado = productos.find(p => p.id === b.idProductoAsociado);
-                  if (prodAsociado) {
-                      window.abrirUIProducto(prodAsociado);
-                  } else {
-                      window.abrirUIProducto(b);
-                  }
-              } else {
-                  window.abrirUIProducto(b);
-              }
-          };
+          bannerImg.onclick = () => window.abrirUIProducto(b);
           bannerContainer.appendChild(bannerImg);
       });
       contenedor.appendChild(bannerContainer);

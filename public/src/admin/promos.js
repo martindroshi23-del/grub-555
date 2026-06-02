@@ -155,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function renderizarSelectProductos() {
     const selectOferta = document.getElementById("ofertaSelectProducto");
-    const selectPromo = document.getElementById("promoSelectProducto");
 
     // Solo productos normales (no banners)
     let productosNormales = todosLosProductos.filter(p => !p.esPromoBanner);
@@ -170,10 +169,6 @@ function renderizarSelectProductos() {
 
     if (selectOferta && document.activeElement !== selectOferta) {
         selectOferta.innerHTML = options;
-    }
-
-    if (selectPromo && document.activeElement !== selectPromo) {
-        selectPromo.innerHTML = options;
     }
 }
 
@@ -234,7 +229,6 @@ window.guardarPromoBanner = async () => {
     const nombre = document.getElementById("promoNombre").value.trim();
     const precio = parseInt(document.getElementById("promoPrecio").value);
     const descripcion = document.getElementById("promoDescripcion").value.trim();
-    const idProductoAsociado = document.getElementById("promoSelectProducto").value;
     const activo = document.getElementById("promoActivo").checked;
 
     if (!nombre || isNaN(precio)) {
@@ -244,11 +238,6 @@ window.guardarPromoBanner = async () => {
 
     if (!currentPromoFile && !promoCropper) {
         alert("Debes subir una imagen para el banner.");
-        return;
-    }
-
-    if (!idProductoAsociado) {
-        alert("Debes asociar la promoción a un producto existente.");
         return;
     }
 
@@ -285,7 +274,6 @@ window.guardarPromoBanner = async () => {
             precio: precio,
             descripcion: descripcion,
             ingredientes: descripcion, // Map it so the UI renders it like normal product ingredients
-            idProductoAsociado: idProductoAsociado,
             activo: activo,
             img: imgUrl,
             stock: 9999, // practically infinite
@@ -311,7 +299,6 @@ window.guardarPromoBanner = async () => {
         document.getElementById("promoNombre").value = "";
         document.getElementById("promoPrecio").value = "";
         document.getElementById("promoDescripcion").value = "";
-        document.getElementById("promoSelectProducto").value = "";
         document.getElementById("promoActivo").checked = true;
         document.getElementById("promoImageUpload").value = "";
         document.getElementById("promoCropperContainer").style.display = "none";
