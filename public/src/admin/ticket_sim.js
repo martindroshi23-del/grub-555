@@ -10,6 +10,7 @@ window.switchEditorTab = (tabId) => {
         if(btn) { btn.classList.add('active'); btn.style.color = 'white'; }
         document.getElementById('tab-menu-digital').style.display = 'flex';
         document.getElementById('tab-diseno-ticket').style.display = 'none';
+        document.getElementById('tab-otros-aspectos').style.display = 'none';
     } else if(tabId === 'diseno-ticket') {
         let btn = document.querySelector('.sidebar-btn-editor[onclick="switchEditorTab(\'diseno-ticket\')"]');
         if(btn) { btn.classList.add('active'); btn.style.color = 'white'; }

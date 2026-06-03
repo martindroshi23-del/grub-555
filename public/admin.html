@@ -307,25 +307,23 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button class="kds-logout-btn" onclick="window.toggleMuteKDS()" id="kdsMuteBtn" style="color: #4caf50;">🔊 Sonido</button>
+          <button class="kds-logout-btn" onclick="window.toggleMuteKDS()" id="kdsMuteBtn" style="color: #4caf50; padding: 6px 12px; font-size: 1.2rem;">🔊</button>
 
-          <button onclick="window.cerrarSesionKDS()" class="kds-logout-btn" style="color: #ff9800;">
+          <button onclick="window.cerrarSesionKDS()" class="kds-logout-btn" style="color: #ff9800; padding: 6px 12px;" title="Cambiar Nombre">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            Cambiar Nombre
           </button>
 
-          <button onclick="cerrarSesion()" class="kds-logout-btn" style="color: #ff6b6b;">
+          <button onclick="cerrarSesion()" class="kds-logout-btn" style="color: #ff6b6b; padding: 6px 12px;" title="Salir">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-            Salir
           </button>
         </div>
       </div>
@@ -1491,31 +1489,6 @@
               </div>
             </div>
 
-            <!-- Tab: Otros Aspectos -->
-            <div id="tab-otros-aspectos" style="display: none; flex-direction: column; height: 100%;">
-              <div class="admin-card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; width: 100%;">
-                <h3 style="color: var(--primary); margin-bottom: 15px;">⚙️ Otros Aspectos del Menú</h3>
-
-                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px;">
-                    <h4 style="margin-bottom: 10px; color: white;">Logo del Encabezado</h4>
-                    <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Sube una imagen para reemplazar el texto "🍕 Grub" en el encabezado del cliente. Usa una imagen ancha (ej: 8:1) para no expandir el alto del encabezado.</p>
-
-                    <input type="file" id="logoUploadInput" accept="image/*" style="background: #2a2a2a; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; width: 100%;">
-
-                    <div id="logoCropperContainer" style="width: 100%; max-height: 300px; display: none; margin-bottom: 15px;">
-                        <img id="logoCropperImage" style="max-width: 100%;">
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" id="btnGuardarLogo" onclick="guardarLogoEncabezado()">Guardar Logo</button>
-                        <button class="btn-secundario" id="btnEliminarLogo" onclick="eliminarLogoEncabezado()" style="background: transparent; border: 1px solid #ff6b6b; color: #ff6b6b;">Eliminar Logo</button>
-                    </div>
-                    <div id="logoUploadStatus" style="font-size: 0.85em; margin-top: 10px;"></div>
-                </div>
-
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -1705,6 +1678,33 @@
             </div>
 
             <!-- Tab: Diseño de Ticket (Simulador) -->
+            <!-- Tab: Otros Aspectos -->
+            <div id="tab-otros-aspectos" style="display: none; flex-direction: column; height: 100%;">
+              <div class="admin-card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; width: 100%;">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">⚙️ Otros Aspectos del Menú</h3>
+
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px; color: white;">Logo del Encabezado</h4>
+                    <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Sube una imagen para reemplazar el texto "🍕 Grub" en el encabezado del cliente. Usa una imagen ancha (ej: 8:1) para no expandir el alto del encabezado.</p>
+
+                    <input type="file" id="logoUploadInput" accept="image/*" style="background: #2a2a2a; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; width: 100%;">
+
+                    <div id="logoCropperContainer" style="width: 100%; max-height: 300px; display: none; margin-bottom: 15px;">
+                        <img id="logoCropperImage" style="max-width: 100%;">
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" id="btnGuardarLogo" onclick="guardarLogoEncabezado()">Guardar Logo</button>
+                        <button class="btn-secundario" id="btnEliminarLogo" onclick="eliminarLogoEncabezado()" style="background: transparent; border: 1px solid #ff6b6b; color: #ff6b6b;">Eliminar Logo</button>
+                    </div>
+                    <div id="logoUploadStatus" style="font-size: 0.85em; margin-top: 10px;"></div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
             <div id="tab-diseno-ticket" style="display: none; flex-direction: column; height: 100%;">
               <div class="admin-card" style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; width: 100%;">
                 <h3 style="color: var(--primary); margin-bottom: 15px;">🧾 Diseño de Ticket (Simulador)</h3>

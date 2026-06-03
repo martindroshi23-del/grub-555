@@ -194,10 +194,10 @@ window.toggleMuteKDS = () => {
     const btn = document.getElementById('kdsMuteBtn');
     if (btn) {
         if (isMuted) {
-            btn.innerHTML = '🔕 Silenciado';
+            btn.innerHTML = '🔕';
             btn.style.color = '#ff6b6b';
         } else {
-            btn.innerHTML = '🔊 Sonido';
+            btn.innerHTML = '🔊';
             btn.style.color = '#4caf50';
         }
     }
@@ -302,10 +302,10 @@ window.iniciarSesionKDS = () => {
     if (btnMute) {
         let isMuted = localStorage.getItem('grub_kds_muted_' + nombreInput) === 'true';
         if (isMuted) {
-            btnMute.innerHTML = '🔕 Silenciado';
+            btnMute.innerHTML = '🔕';
             btnMute.style.color = '#ff6b6b';
         } else {
-            btnMute.innerHTML = '🔊 Sonido';
+            btnMute.innerHTML = '🔊';
             btnMute.style.color = '#4caf50';
         }
     }
@@ -487,7 +487,7 @@ window.renderizarKDS = () => {
   containerPreparando.innerHTML = htmlMiEstacion || `
     <div style="width:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#777; grid-column: 1 / -1; margin-top: 40px;">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 13.5V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.5M6 13.5l-2-2a2 2 0 0 1 0-2.828l7-7a2 2 0 0 1 2.828 0l7 7a2 2 0 0 1 0 2.828l-2 2M6 13.5V13.5"></path></svg>
-        <p style="margin-top:15px; text-align:center;">No tomaste ning煤n pedido.<br>Seleccion谩 uno de la barra 馃憠</p>
+        <p style="margin-top:15px; text-align:center;">No tomaste ningún pedido.<br>Seleccioná uno de la barra 👉</p>
     </div>`;
 
   // Renderizar Derecha (Con el bot贸n Ojito)
