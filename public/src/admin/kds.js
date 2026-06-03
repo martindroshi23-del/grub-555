@@ -27,7 +27,7 @@ window.iniciarSesionKDS = () => {
     }
 
     // Almacenar localmente
-    localStorage.setItem("grub_kds_nombre", nombreInput);
+    sessionStorage.setItem("grub_kds_nombre", nombreInput);
     document.getElementById("modalLoginKDS").style.display = "none";
 
     // Renderizar
@@ -35,10 +35,8 @@ window.iniciarSesionKDS = () => {
 };
 
 window.cerrarSesionKDS = () => {
-    localStorage.removeItem("grub_kds_nombre");
+    sessionStorage.removeItem("grub_kds_nombre");
     document.getElementById("modalLoginKDS").style.display = "flex";
-    if (document.getElementById("kds-preparando-container")) document.getElementById("kds-preparando-container").innerHTML = "";
-    if (document.getElementById("kds-pendientes-container")) document.getElementById("kds-pendientes-container").innerHTML = "";
 };
 
 // Render Logic
@@ -48,10 +46,12 @@ window.renderizarKDS = () => {
 
   if (!containerPreparando || !containerPendientes || window.rolActual !== "cocina") return;
 
-  const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+  const nombreCocinero = sessionStorage.getItem("grub_kds_nombre");
   if (!nombreCocinero) {
       document.getElementById("modalLoginKDS").style.display = "flex";
-      return;
+      // No cortamos el renderizado visual de fondo, simplemente no permitiremos acciones
+      const nameDisp = document.getElementById("kdsNombreDisplay");
+      if (nameDisp) nameDisp.innerText = "";
   } else {
       document.getElementById("modalLoginKDS").style.display = "none";
       const nameDisp = document.getElementById("kdsNombreDisplay");
@@ -274,9 +274,9 @@ kdsTimerInterval = setInterval(() => {
 }, 1000);
 
 window.tomarPedidoKDS = async (idVenta) => {
-  const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+  const nombreCocinero = sessionStorage.getItem("grub_kds_nombre");
   if (!nombreCocinero) {
-      alert("Por favor identifícate primero.");
+      document.getElementById("modalLoginKDS").style.display = "flex";
       return;
   }
 

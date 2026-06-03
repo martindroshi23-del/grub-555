@@ -48,6 +48,9 @@ export const ingresar = async () => {
 };
 
 export const cerrarSesion = () => {
-    localStorage.removeItem("grub_kds_nombre");
-    return signOut(auth);
+    sessionStorage.removeItem("grub_kds_nombre");
+    localStorage.removeItem("grub_kds_nombre"); // just in case
+    return signOut(auth).then(() => {
+        window.location.reload();
+    });
 };
