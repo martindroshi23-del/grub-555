@@ -1,0 +1,115 @@
+npm warn exec The following package was not found and will be installed: serve@14.2.6
+ INFO  Accepting connections at http://localhost:3000
+ HTTP  6/3/2026 6:58:12 PM ::1 GET /admin.html
+ HTTP  6/3/2026 6:58:12 PM ::1 Returned 301 in 333 ms
+ HTTP  6/3/2026 6:58:13 PM ::1 GET /admin
+ HTTP  6/3/2026 6:58:13 PM ::1 Returned 200 in 15 ms
+ HTTP  6/3/2026 6:58:13 PM ::1 GET /css/global.css
+ HTTP  6/3/2026 6:58:13 PM ::1 Returned 200 in 3 ms
+ HTTP  6/3/2026 6:58:13 PM ::1 GET /css/admin.css
+ HTTP  6/3/2026 6:58:13 PM ::1 GET /src/admin/promos.js
+ HTTP  6/3/2026 6:58:13 PM ::1 GET /src/admin/app.js
+ HTTP  6/3/2026 6:58:13 PM ::1 Returned 200 in 6 ms
+ HTTP  6/3/2026 6:58:13 PM ::1 Returned 200 in 7 ms
+ HTTP  6/3/2026 6:58:13 PM ::1 Returned 200 in 8 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/config/firebase.config.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/shared/toast.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/inventory.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/core.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/pd.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/ui.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 12 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 11 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 11 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 13 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 8 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 10 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/editor.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/kds.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/ticket_sim.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/services/auth.service.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/services/admin.service.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 9 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 10 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 9 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 10 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 200 in 14 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /admin
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 1 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /css/global.css
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /css/admin.css
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/promos.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/app.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 3 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 3 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/config/firebase.config.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/shared/toast.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/inventory.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/core.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 4 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 4 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 5 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 5 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/ui.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/kds.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/editor.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/pd.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/admin/ticket_sim.js
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/services/auth.service.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 2 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 1 ms
+ HTTP  6/3/2026 6:58:14 PM ::1 GET /src/services/admin.service.js
+ HTTP  6/3/2026 6:58:14 PM ::1 Returned 304 in 1 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /index.html
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 301 in 1 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /index
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 301 in 0 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 2 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /css/global.css
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /css/client.css
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /src/client/app.js
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 2 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 2 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /src/config/firebase.config.js
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /src/services/menu.service.js
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /src/shared/utils.js
+ HTTP  6/3/2026 7:01:19 PM ::1 GET /src/client/cart.js
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 4 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 9 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 8 ms
+ HTTP  6/3/2026 7:01:19 PM ::1 Returned 200 in 8 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /index.html
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 301 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /index
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 301 in 0 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /css/global.css
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /css/client.css
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 0 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /src/client/app.js
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /src/config/firebase.config.js
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /src/services/menu.service.js
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /src/shared/utils.js
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+ HTTP  6/3/2026 7:01:51 PM ::1 GET /src/client/cart.js
+ HTTP  6/3/2026 7:01:51 PM ::1 Returned 200 in 1 ms
+
+ INFO  Gracefully shutting down. Please wait...
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.16.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.16.0
+npm notice To update run: npm install -g npm@11.16.0
+npm notice

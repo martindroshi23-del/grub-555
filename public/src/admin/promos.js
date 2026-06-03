@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     cropperContainer.style.display = 'block';
 
                     promoCropper = new Cropper(cropperImage, {
-                        aspectRatio: 2.3 / 1,
+                        aspectRatio: 2.3 / 1.2,
                         viewMode: 1,
                         autoCropArea: 1,
                         background: false
@@ -248,7 +248,7 @@ window.guardarPromoBanner = async () => {
 
     try {
         // Use Cloudinary logic with Cropper blob
-        const blob = await new Promise(resolve => promoCropper.getCroppedCanvas({ width: 1200, height: 522 }).toBlob(resolve, 'image/jpeg', 0.8));
+            const blob = await new Promise(resolve => promoCropper.getCroppedCanvas({ width: 1200, height: 626 }).toBlob(resolve, 'image/jpeg', 0.8));
 
         const formData = new FormData();
         formData.append('upload_preset', 'menu_grub');

@@ -44,6 +44,16 @@ updateViewportInfo();
 onSnapshot(doc(db, "config", "layout"), (docSnap) => {
     if (docSnap.exists()) {
         layoutConfig = docSnap.data();
+
+        let headerEl = document.getElementById("client-header");
+        if (headerEl) {
+            if (layoutConfig.headerLogo) {
+                headerEl.innerHTML = `<img src="${layoutConfig.headerLogo}" style="max-height: 50px; max-width: 100%;">`;
+            } else {
+                headerEl.innerHTML = "";
+            }
+        }
+
         if (productos.length > 0) mostrarMenu();
     }
 });
@@ -147,9 +157,6 @@ function mostrarMenu() {
 
   // Remove "Promos" from normal categories since banners handle them, but if they want "Ofertas" in quick links
   let qlHtml = ``;
-  if (banners.length > 0 || productos.some(p => p.precioOferta)) {
-      qlHtml += `<a href="#" class="quick-link-btn" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">🔥 Ofertas</a>`;
-  }
 
   categoriasUsadas.forEach(cat => {
     let emoji = cat.toLowerCase().includes('pizza') ? '🍕' : (cat.toLowerCase().includes('hamburguesa') ? '🍔' : '🍽️');
