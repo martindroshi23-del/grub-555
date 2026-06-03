@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     cropperContainer.style.display = 'block';
 
                     promoCropper = new Cropper(cropperImage, {
-                        aspectRatio: 2.3 / 1.2,
+                        aspectRatio: 2.3 / 1.7, // Increased height for banners
                         viewMode: 1,
                         autoCropArea: 1,
                         background: false

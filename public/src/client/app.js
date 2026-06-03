@@ -354,7 +354,7 @@ function renderizarOpcionesProducto() {
   }
 
   if (productoActual.tipos && productoActual.tipos.length > 0) {
-    html += `<div class="opcion-grupo"><h4>Tipo</h4>`;
+    html += `<div class="opcion-grupo"><h4>Tipo</h4><div class="scroll-horizontal">`;
     productoActual.tipos.forEach(t => {
       let objT = typeof t === 'string' ? {nombre: t, precio: 0} : t;
       let seleccionado = (seleccionActual.tipo && seleccionActual.tipo.nombre === objT.nombre);
@@ -363,22 +363,22 @@ function renderizarOpcionesProducto() {
       // We escape the JSON for inline onclick
       html += `<div class="${clase}" onclick='setTipo(${JSON.stringify(objT).replace(/'/g, "&apos;")})'>${objT.nombre}${textoPrecio}</div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   }
   
   if (productoActual.extras && productoActual.extras.length > 0) {
-    html += `<div class="opcion-grupo"><h4>Agregar Extras</h4>`;
+    html += `<div class="opcion-grupo"><h4>¿Te gustaría agregar algo más?</h4><div class="scroll-horizontal">`;
     productoActual.extras.forEach(e => {
       let objE = typeof e === 'string' ? {nombre: e, precio: 0} : e;
       let seleccionado = seleccionActual.extras.find(ex => ex.nombre === objE.nombre);
       let clase = seleccionado ? "chip seleccionado" : "chip";
       html += `<div class="${clase}" onclick='toggleExtra("${objE.nombre.replace(/"/g, '&quot;')}", ${objE.precio})'>+ ${objE.nombre} (+$${objE.precio})</div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   }
   
   if (productoActual.quitar && productoActual.quitar.length > 0) {
-    html += `<div class="opcion-grupo"><h4>Quitar Ingredientes</h4>`;
+    html += `<div class="opcion-grupo"><h4>¿Te gustaría quitar algo?</h4><div class="scroll-horizontal">`;
     productoActual.quitar.forEach(q => {
       let objQ = typeof q === 'string' ? {nombre: q, precio: 0} : q;
       let seleccionado = seleccionActual.quitar.find(item => item.nombre === objQ.nombre);
@@ -386,12 +386,12 @@ function renderizarOpcionesProducto() {
       let textoPrecio = objQ.precio !== 0 ? ` (${objQ.precio > 0 ? '+' : ''}$${objQ.precio})` : '';
       html += `<div class="${clase}" onclick='toggleQuitar(${JSON.stringify(objQ).replace(/'/g, "&apos;")})'>Sin ${objQ.nombre}${textoPrecio}</div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   }
 
   let bebidasDisponibles = productos.filter(p => p.esBebida && p.stock > 0);
   if (bebidasDisponibles.length > 0) {
-    html += `<div class="opcion-grupo"><h4>🥤 ¿Agregamos una bebida?</h4>`;
+    html += `<div class="opcion-grupo"><h4>🥤 ¿Agregamos una bebida?</h4><div class="scroll-horizontal-bebidas">`;
     bebidasDisponibles.forEach(b => {
       let sel = seleccionActual.bebidas.find(sel => sel.id === b.id);
       let cantidadActual = sel ? sel.cantidad : 0;
@@ -413,7 +413,7 @@ function renderizarOpcionesProducto() {
           </div>
         </div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   }
 
   html += `<button class="btn-enviar-final" onclick="confirmarAgregado()">Agregar al Pedido - $${precioCalculado}</button>`;
