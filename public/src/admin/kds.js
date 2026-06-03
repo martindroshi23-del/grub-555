@@ -28,7 +28,7 @@ window.iniciarSesionKDS = () => {
 
     // Almacenar localmente
     sessionStorage.setItem("grub_kds_nombre", nombreInput);
-    document.getElementById("modalLoginKDS").style.display = "none";
+    document.getElementById("modalLoginKDS").style.setProperty("display", "none", "important");
 
     // Renderizar
     window.renderizarKDS();
@@ -36,7 +36,7 @@ window.iniciarSesionKDS = () => {
 
 window.cerrarSesionKDS = () => {
     sessionStorage.removeItem("grub_kds_nombre");
-    document.getElementById("modalLoginKDS").style.display = "flex";
+    document.getElementById("modalLoginKDS").style.setProperty("display", "flex", "important");
 };
 
 // Render Logic
@@ -48,12 +48,12 @@ window.renderizarKDS = () => {
 
   const nombreCocinero = sessionStorage.getItem("grub_kds_nombre");
   if (!nombreCocinero) {
-      document.getElementById("modalLoginKDS").style.display = "flex";
+      document.getElementById("modalLoginKDS").style.setProperty("display", "flex", "important");
       // No cortamos el renderizado visual de fondo, simplemente no permitiremos acciones
       const nameDisp = document.getElementById("kdsNombreDisplay");
       if (nameDisp) nameDisp.innerText = "";
   } else {
-      document.getElementById("modalLoginKDS").style.display = "none";
+      document.getElementById("modalLoginKDS").style.setProperty("display", "none", "important");
       const nameDisp = document.getElementById("kdsNombreDisplay");
       if (nameDisp) nameDisp.innerText = nombreCocinero;
   }
@@ -88,11 +88,14 @@ window.renderizarKDS = () => {
 
         let extraInfo = [];
         if (item.desglose) {
-            for (let key in item.desglose) {
-                let val = item.desglose[key];
-                if (key === 'A quitar' || key === 'Sin') extraInfo.push({ text: `Sin ${val}`, type: 'remove' });
-                else if (key !== 'base' && key !== 'tipo') extraInfo.push({ text: `${val}`, type: 'add' });
-                else if (key === 'tipo' && item.desglose.tipo && item.desglose.tipo.nombre) extraInfo.push({ text: `Tipo: ${item.desglose.tipo.nombre}`, type: 'add' });
+            if (item.desglose.tipo && item.desglose.tipo.nombre) {
+                extraInfo.push({ text: `Tipo: ${item.desglose.tipo.nombre}`, type: 'add' });
+            }
+            if (item.desglose.extras && Array.isArray(item.desglose.extras)) {
+                item.desglose.extras.forEach(e => extraInfo.push({ text: `${e.nombre}`, type: 'add' }));
+            }
+            if (item.desglose.quitar && Array.isArray(item.desglose.quitar)) {
+                item.desglose.quitar.forEach(q => extraInfo.push({ text: `Sin ${q.nombre}`, type: 'remove' }));
             }
         } else {
             if (item.modificadores && Array.isArray(item.modificadores)) {
@@ -276,7 +279,7 @@ kdsTimerInterval = setInterval(() => {
 window.tomarPedidoKDS = async (idVenta) => {
   const nombreCocinero = sessionStorage.getItem("grub_kds_nombre");
   if (!nombreCocinero) {
-      document.getElementById("modalLoginKDS").style.display = "flex";
+      document.getElementById("modalLoginKDS").style.setProperty("display", "flex", "important");
       return;
   }
 
