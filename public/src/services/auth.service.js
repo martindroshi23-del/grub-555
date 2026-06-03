@@ -47,4 +47,7 @@ export const ingresar = async () => {
     } 
 };
 
-export const cerrarSesion = () => signOut(auth);
+export const cerrarSesion = () => {
+    localStorage.removeItem("grub_kds_nombre");
+    return signOut(auth);
+};
