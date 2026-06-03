@@ -34,17 +34,14 @@ kdsStyles.innerHTML = `
       display: none !important;
   }
 
-  /* 2. Usuario en la esquina-esquina absoluta (Sin Emojis) */
+  /* 2. Usuario (Sin Emojis) */
   #kdsNombreDisplay {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
       background: #ff9800 !important;
       color: #000 !important;
       padding: 6px 15px !important;
-      border-radius: 0 0 10px 0 !important;
+      border-radius: 8px !important;
       font-weight: 900 !important;
-      font-size: 0.95rem !important;
+      font-size: 1.2rem !important;
       text-transform: uppercase !important;
       z-index: 9999 !important;
       display: block !important;
@@ -75,7 +72,7 @@ kdsStyles.innerHTML = `
       gap: 15px !important;
       width: calc(100% - 95px) !important; 
       height: calc(100vh - 90px) !important;
-      padding: 15px 15px 40px 15px !important;
+      padding: 30px 15px 40px 15px !important;
       margin-top: 10px !important; 
       overflow-y: auto !important; 
       overflow-x: hidden !important;
@@ -186,8 +183,32 @@ document.head.appendChild(kdsStyles);
 window.audioCtx = null;
 let estadoAnteriorPedidos = {};
 
+window.toggleMuteKDS = () => {
+    const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+    if (!nombreCocinero) return;
+
+    let isMuted = localStorage.getItem('grub_kds_muted_' + nombreCocinero) === 'true';
+    isMuted = !isMuted;
+    localStorage.setItem('grub_kds_muted_' + nombreCocinero, isMuted);
+
+    const btn = document.getElementById('kdsMuteBtn');
+    if (btn) {
+        if (isMuted) {
+            btn.innerHTML = '🔕 Silenciado';
+            btn.style.color = '#ff6b6b';
+        } else {
+            btn.innerHTML = '🔊 Sonido';
+            btn.style.color = '#4caf50';
+        }
+    }
+};
+
 const reproducirSonido = (tipo) => {
     if (!window.audioCtx) return;
+    const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+    if (nombreCocinero && localStorage.getItem('grub_kds_muted_' + nombreCocinero) === 'true') {
+        return;
+    }
     try {
         const osc = window.audioCtx.createOscillator();
         const gain = window.audioCtx.createGain();
@@ -276,6 +297,19 @@ window.iniciarSesionKDS = () => {
     localStorage.setItem("grub_kds_nombre", nombreInput);
     inputElement.value = "";
     
+    // Update mute button state for this user
+    const btnMute = document.getElementById('kdsMuteBtn');
+    if (btnMute) {
+        let isMuted = localStorage.getItem('grub_kds_muted_' + nombreInput) === 'true';
+        if (isMuted) {
+            btnMute.innerHTML = '🔕 Silenciado';
+            btnMute.style.color = '#ff6b6b';
+        } else {
+            btnMute.innerHTML = '🔊 Sonido';
+            btnMute.style.color = '#4caf50';
+        }
+    }
+
     window.verificarUsuarioKDS();
     window.renderizarKDS();
 };
@@ -299,7 +333,13 @@ const limpiarTextosKDS = () => {
         if (t.children.length === 0) {
             const texto = t.innerText ? t.innerText.trim().toLowerCase() : '';
             if (texto.includes('monitor de cocina') || texto === 'kds' || texto.includes('馃敟 en preparaci贸n') || texto.includes('(visi贸n global)')) {
-                t.style.setProperty('display', 'none', 'important');
+                // Remove this aggressive display none to avoid removing our own headers.
+                // The previous code had a bug where it hid our UI elements.
+                // Wait, if I just remove this block entirely, it might break the original developer's intent
+                // Actually we just shouldn't hide the "Monitor de cocina (KDS)" because we already replaced it in HTML.
+                if (texto.includes('🔥 en preparación') || texto.includes('(visión global)')) {
+                    // Do nothing here because we want them visible now, or rather we don't need this aggressive hiding.
+                }
             }
         }
     });

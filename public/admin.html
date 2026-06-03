@@ -239,7 +239,7 @@
               d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
             />
           </svg>
-          <span>Monitor de Cocina (KDS) <span id="kdsNombreDisplay" style="font-size: 0.7em; margin-left: 10px; color: #888; background: #222; padding: 4px 10px; border-radius: 15px;"></span></span>
+          <span><span id="kdsNombreDisplay" style="font-size: 1.5rem; color: var(--primary); background: transparent; padding: 0;"></span></span>
         </div>
 
         <div class="kds-view-switcher">
@@ -307,6 +307,8 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
+          <button class="kds-logout-btn" onclick="window.toggleMuteKDS()" id="kdsMuteBtn" style="color: #4caf50;">🔊 Sonido</button>
+
           <button onclick="window.cerrarSesionKDS()" class="kds-logout-btn" style="color: #ff9800;">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
@@ -314,7 +316,7 @@
               <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            Cambiar Cocinero
+            Cambiar Nombre
           </button>
 
           <button onclick="cerrarSesion()" class="kds-logout-btn" style="color: #ff6b6b;">
@@ -323,7 +325,7 @@
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-            Salir (Logout)
+            Salir
           </button>
         </div>
       </div>
@@ -1489,6 +1491,31 @@
               </div>
             </div>
 
+            <!-- Tab: Otros Aspectos -->
+            <div id="tab-otros-aspectos" style="display: none; flex-direction: column; height: 100%;">
+              <div class="admin-card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; width: 100%;">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">⚙️ Otros Aspectos del Menú</h3>
+
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px; color: white;">Logo del Encabezado</h4>
+                    <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Sube una imagen para reemplazar el texto "🍕 Grub" en el encabezado del cliente. Usa una imagen ancha (ej: 8:1) para no expandir el alto del encabezado.</p>
+
+                    <input type="file" id="logoUploadInput" accept="image/*" style="background: #2a2a2a; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; width: 100%;">
+
+                    <div id="logoCropperContainer" style="width: 100%; max-height: 300px; display: none; margin-bottom: 15px;">
+                        <img id="logoCropperImage" style="max-width: 100%;">
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" id="btnGuardarLogo" onclick="guardarLogoEncabezado()">Guardar Logo</button>
+                        <button class="btn-secundario" id="btnEliminarLogo" onclick="eliminarLogoEncabezado()" style="background: transparent; border: 1px solid #ff6b6b; color: #ff6b6b;">Eliminar Logo</button>
+                    </div>
+                    <div id="logoUploadStatus" style="font-size: 0.85em; margin-top: 10px;"></div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1506,6 +1533,10 @@
               <button class="sidebar-btn-editor" onclick="switchEditorTab('diseno-ticket')" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: none; border: none; color: #777; cursor: pointer; border-radius: 8px; text-align: left; transition: 0.3s;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"></path><path d="M16 16H8"></path><path d="M16 12H8"></path><path d="M10 8H8"></path></svg>
                 Diseño de Ticket
+              </button>
+              <button class="sidebar-btn-editor" onclick="switchEditorTab('otros-aspectos')" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: none; border: none; color: #777; cursor: pointer; border-radius: 8px; text-align: left; transition: 0.3s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Otros Aspectos
               </button>
             </div>
           </aside>

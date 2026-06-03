@@ -14,8 +14,15 @@ window.switchEditorTab = (tabId) => {
         let btn = document.querySelector('.sidebar-btn-editor[onclick="switchEditorTab(\'diseno-ticket\')"]');
         if(btn) { btn.classList.add('active'); btn.style.color = 'white'; }
         document.getElementById('tab-menu-digital').style.display = 'none';
+        document.getElementById('tab-otros-aspectos').style.display = 'none';
         document.getElementById('tab-diseno-ticket').style.display = 'flex';
         renderTicketSimulador();
+    } else if(tabId === 'otros-aspectos') {
+        let btn = document.querySelector('.sidebar-btn-editor[onclick="switchEditorTab(\'otros-aspectos\')"]');
+        if(btn) { btn.classList.add('active'); btn.style.color = 'white'; }
+        document.getElementById('tab-menu-digital').style.display = 'none';
+        document.getElementById('tab-diseno-ticket').style.display = 'none';
+        document.getElementById('tab-otros-aspectos').style.display = 'flex';
     }
 };
 

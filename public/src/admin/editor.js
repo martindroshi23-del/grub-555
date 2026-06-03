@@ -143,6 +143,136 @@ window.moverAlDock = (id) => {
     if (typeof window.guardarConfigLayout === 'function') window.guardarConfigLayout();
 };
 
+// Lógica de Logo Encabezado "Otros Aspectos"
+let logoCropper = null;
+let currentLogoFile = null;
+
+setTimeout(() => {
+    const fileInputLogo = document.getElementById('logoUploadInput');
+    const cropperImageLogo = document.getElementById('logoCropperImage');
+    const cropperContainerLogo = document.getElementById('logoCropperContainer');
+
+    if (fileInputLogo) {
+        fileInputLogo.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                currentLogoFile = e.target.files[0];
+
+                if (logoCropper) {
+                    logoCropper.destroy();
+                    logoCropper = null;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    cropperImageLogo.src = ev.target.result;
+                    cropperContainerLogo.style.display = 'block';
+
+                    logoCropper = new Cropper(cropperImageLogo, {
+                        aspectRatio: 8 / 1, // Logo header needs to be wide and short
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false
+                    });
+                };
+                reader.readAsDataURL(currentLogoFile);
+            }
+        });
+    }
+}, 1000);
+
+window.guardarLogoEncabezado = async () => {
+    const btn = document.getElementById("btnGuardarLogo");
+    const status = document.getElementById("logoUploadStatus");
+
+    if (!currentLogoFile && !logoCropper) {
+        alert("Debes seleccionar una imagen para subir.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Subiendo...";
+    status.innerText = "Subiendo y guardando logo...";
+    status.style.color = "#ff9800";
+
+    try {
+        const blob = await new Promise(resolve => logoCropper.getCroppedCanvas({ width: 800, height: 100 }).toBlob(resolve, 'image/jpeg', 0.8));
+
+        const formData = new FormData();
+        formData.append('upload_preset', 'menu_grub');
+        formData.append('file', blob);
+
+        const res = await fetch('https://api.cloudinary.com/v1_1/dtsl83iyh/auto/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        const secureUrl = data.secure_url;
+
+        // Save URL in config layout
+        window.layoutConfig = window.layoutConfig || {};
+        window.layoutConfig.headerLogo = secureUrl;
+
+        // This function exists in core.js and saves layoutConfig to Firebase
+        await window.guardarConfigLayout();
+
+        // Reset UI
+        document.getElementById("logoUploadInput").value = "";
+        document.getElementById("logoCropperContainer").style.display = "none";
+        if (logoCropper) {
+            logoCropper.destroy();
+            logoCropper = null;
+        }
+        currentLogoFile = null;
+
+        status.innerText = "¡Logo guardado exitosamente!";
+        status.style.color = "#00c853";
+        setTimeout(() => { status.innerText = ""; btn.innerText = "Guardar Logo"; btn.disabled = false; }, 3000);
+
+    } catch (err) {
+        console.error("Error saving logo:", err);
+        status.innerText = "Error al guardar el logo.";
+        status.style.color = "#d32f2f";
+        btn.innerText = "Guardar Logo";
+        btn.disabled = false;
+    }
+};
+
+window.eliminarLogoEncabezado = async () => {
+    if (confirm("¿Estás seguro de que deseas eliminar el logo del encabezado? Volverá a estar vacío.")) {
+        const btn = document.getElementById("btnEliminarLogo");
+        const status = document.getElementById("logoUploadStatus");
+
+        btn.disabled = true;
+        status.innerText = "Eliminando...";
+
+        window.layoutConfig = window.layoutConfig || {};
+        window.layoutConfig.headerLogo = null;
+
+        try {
+            await window.guardarConfigLayout();
+
+            // Limpiar inputs
+            document.getElementById("logoUploadInput").value = "";
+            document.getElementById("logoCropperContainer").style.display = "none";
+            if (logoCropper) {
+                logoCropper.destroy();
+                logoCropper = null;
+            }
+            currentLogoFile = null;
+
+            status.innerText = "Logo eliminado correctamente.";
+            status.style.color = "#00c853";
+            setTimeout(() => { status.innerText = ""; btn.disabled = false; }, 3000);
+        } catch (e) {
+            console.error(e);
+            status.innerText = "Error al eliminar.";
+            status.style.color = "#d32f2f";
+            btn.disabled = false;
+        }
+    }
+}
+
 window.moverAlGrid = (id) => {
     if (!window.layoutConfig.orden) window.layoutConfig.orden = [];
     if (!window.layoutConfig.orden.includes(id)) {
