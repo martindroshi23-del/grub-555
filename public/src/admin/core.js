@@ -162,6 +162,13 @@ window.copiarPedidoTexto = (idVenta) => {
             document.getElementById('admin-screen').style.display = 'none';
             document.getElementById('main-sidebar').style.display = 'none';
             cocinaScreen.style.display = 'flex';
+
+            // Requerir login de cocinero al entrar a la vista de cocina
+            const nombreCocinero = sessionStorage.getItem("grub_kds_nombre");
+            if (!nombreCocinero) {
+                document.getElementById("modalLoginKDS").style.setProperty("display", "flex", "important");
+            }
+
             if (typeof window.renderizarKDS === 'function') {
                 window.renderizarKDS();
             }
