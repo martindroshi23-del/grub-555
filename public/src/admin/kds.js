@@ -37,7 +37,8 @@ window.iniciarSesionKDS = () => {
 window.cerrarSesionKDS = () => {
     localStorage.removeItem("grub_kds_nombre");
     document.getElementById("modalLoginKDS").style.display = "flex";
-    document.getElementById("kds-container").innerHTML = ""; // Limpiar vista
+    if (document.getElementById("kds-preparando-container")) document.getElementById("kds-preparando-container").innerHTML = "";
+    if (document.getElementById("kds-pendientes-container")) document.getElementById("kds-pendientes-container").innerHTML = "";
 };
 
 // Render Logic

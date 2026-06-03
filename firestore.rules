@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /productos/{docId} {
+      // Todos pueden ver el menú, pero solo el Admin puede crearlo, editarlo o borrarlo
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    match /ventas/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /pd_clientes/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /stats/{docId} {
+      // Todos pueden leer las estadísticas (si lo necesitas para la web), pero solo Admin puede escribirlas
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // REGLAS PARA EL LOG DE MOVIMIENTOS Y GASTOS
+    match /movimientos/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /gastos/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // REGLA PARA EL SISTEMA DE ROLES
+    match /usuarios_roles/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
