@@ -44,12 +44,12 @@
     .opcion-grupo { margin-bottom: 25px; }
     .opcion-grupo h4 { margin-bottom: 12px; color: var(--text-light); font-size: 0.95rem; text-transform: uppercase;}
 
-    .scroll-horizontal { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 10px; padding-bottom: 10px; }
+    .scroll-horizontal { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; padding-bottom: 10px; }
     .scroll-horizontal::-webkit-scrollbar { display: none; }
-    .scroll-horizontal-bebidas { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 10px; padding-bottom: 10px; }
+    .scroll-horizontal-bebidas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; padding-bottom: 10px; }
     .scroll-horizontal-bebidas::-webkit-scrollbar { display: none; }
 
-    .chip { background: #2a2a2a; border: 2px solid transparent; padding: 10px 18px; border-radius: 25px; display: inline-block; margin: 0; color: #ddd; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .chip { background: #2a2a2a; border: 2px solid transparent; padding: 10px 18px; border-radius: 25px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0; color: #ddd; transition: 0.2s; white-space: normal; }
     .chip.seleccionado { background: rgba(255, 94, 0, 0.1); border-color: var(--primary); color: var(--primary); }
     .chip.quitar.seleccionado { background: rgba(255, 60, 60, 0.1); border-color: #ff3c3c; color: #ff3c3c; }
 

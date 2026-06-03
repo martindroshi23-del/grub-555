@@ -248,7 +248,7 @@ window.guardarPromoBanner = async () => {
 
     try {
         // Use Cloudinary logic with Cropper blob
-            const blob = await new Promise(resolve => promoCropper.getCroppedCanvas({ width: 1200, height: 626 }).toBlob(resolve, 'image/jpeg', 0.8));
+            const blob = await new Promise(resolve => promoCropper.getCroppedCanvas({ width: 1150, height: 850 }).toBlob(resolve, 'image/jpeg', 0.8));
 
         const formData = new FormData();
         formData.append('upload_preset', 'menu_grub');

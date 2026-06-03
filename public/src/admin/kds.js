@@ -333,13 +333,7 @@ const limpiarTextosKDS = () => {
         if (t.children.length === 0) {
             const texto = t.innerText ? t.innerText.trim().toLowerCase() : '';
             if (texto.includes('monitor de cocina') || texto === 'kds' || texto.includes('馃敟 en preparaci贸n') || texto.includes('(visi贸n global)')) {
-                // Remove this aggressive display none to avoid removing our own headers.
-                // The previous code had a bug where it hid our UI elements.
-                // Wait, if I just remove this block entirely, it might break the original developer's intent
-                // Actually we just shouldn't hide the "Monitor de cocina (KDS)" because we already replaced it in HTML.
-                if (texto.includes('🔥 en preparación') || texto.includes('(visión global)')) {
-                    // Do nothing here because we want them visible now, or rather we don't need this aggressive hiding.
-                }
+                // Removed aggressive hiding of elements to preserve our custom layout.
             }
         }
     });
