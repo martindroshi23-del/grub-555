@@ -3,7 +3,8 @@ import { db } from "../config/firebase.config.js";
 
 // Layout Switcher Logic
 window.setKdsView = (view) => {
-  const container = document.getElementById("kds-container");
+  const c1 = document.getElementById("kds-preparando-container");
+  const c2 = document.getElementById("kds-pendientes-container");
   const btns = document.querySelectorAll(".kds-view-btn");
 
   // Update active class on buttons
@@ -13,23 +14,60 @@ window.setKdsView = (view) => {
     .classList.add("active");
 
   // Update container class
-  container.className = `kds-grid view-${view}`;
+  if (c1) c1.className = `kds-grid view-${view}`;
+  if (c2) c2.className = `kds-grid view-${view}`;
+};
+
+// Authentication Logic
+window.iniciarSesionKDS = () => {
+    const nombreInput = document.getElementById("kdsNombreCocinero").value.trim();
+    if (!nombreInput) {
+        alert("Por favor, ingresa tu nombre.");
+        return;
+    }
+
+    // Almacenar localmente
+    localStorage.setItem("grub_kds_nombre", nombreInput);
+    document.getElementById("modalLoginKDS").style.display = "none";
+
+    // Renderizar
+    window.renderizarKDS();
+};
+
+window.cerrarSesionKDS = () => {
+    localStorage.removeItem("grub_kds_nombre");
+    document.getElementById("modalLoginKDS").style.display = "flex";
+    document.getElementById("kds-container").innerHTML = ""; // Limpiar vista
 };
 
 // Render Logic
 window.renderizarKDS = () => {
-  const container = document.getElementById("kds-container");
-  if (!container || window.rolActual !== "cocina") return;
+  const containerPreparando = document.getElementById("kds-preparando-container");
+  const containerPendientes = document.getElementById("kds-pendientes-container");
 
-  let html = "";
+  if (!containerPreparando || !containerPendientes || window.rolActual !== "cocina") return;
 
-  // Filter for active orders (Pendiente / En preparación)
+  const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+  if (!nombreCocinero) {
+      document.getElementById("modalLoginKDS").style.display = "flex";
+      return;
+  } else {
+      document.getElementById("modalLoginKDS").style.display = "none";
+      const nameDisp = document.getElementById("kdsNombreDisplay");
+      if (nameDisp) nameDisp.innerText = nombreCocinero;
+  }
+
+  let htmlPreparando = "";
+  let htmlPendientes = "";
+
+  // Filter for active orders
   const activeOrders = (window.ventasGlobales || [])
     .filter((v) => v.estado === "Pendiente" || v.estado === "En preparación")
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha)); // Oldest first
 
   if (activeOrders.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #777; margin-top: 50px; font-size: 1.5rem;">No hay pedidos activos.</div>`;
+    containerPreparando.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #777; margin-top: 20px; font-size: 1.2rem;">Ningún pedido en preparación.</div>`;
+    containerPendientes.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #777; margin-top: 20px; font-size: 1.2rem;">No hay pedidos pendientes.</div>`;
     return;
   }
 
@@ -42,41 +80,86 @@ window.renderizarKDS = () => {
 
     let bodyHtml = "";
     if (v.detalle && Array.isArray(v.detalle)) {
-      // Re-use core sorting logic if available, so side-dishes drop to the bottom
-      let orderedItems =
-        typeof window.ordenarItemsPedido === "function"
-          ? window.ordenarItemsPedido(v.detalle)
-          : v.detalle;
+      let orderedItems = typeof window.ordenarItemsPedido === "function" ? window.ordenarItemsPedido(v.detalle) : v.detalle;
 
       orderedItems.forEach((item) => {
         let modsHtml = "";
 
-        if (item.extras && item.extras.length > 0) {
-          item.extras.forEach((ext) => {
-            modsHtml += `<div class="kds-mod add"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${ext.nombre}</div>`;
-          });
+        let extraInfo = [];
+        if (item.desglose) {
+            for (let key in item.desglose) {
+                let val = item.desglose[key];
+                if (key === 'A quitar' || key === 'Sin') extraInfo.push({ text: `Sin ${val}`, type: 'remove' });
+                else if (key !== 'base' && key !== 'tipo') extraInfo.push({ text: `${val}`, type: 'add' });
+                else if (key === 'tipo' && item.desglose.tipo && item.desglose.tipo.nombre) extraInfo.push({ text: `Tipo: ${item.desglose.tipo.nombre}`, type: 'add' });
+            }
+        } else {
+            if (item.modificadores && Array.isArray(item.modificadores)) {
+                item.modificadores.forEach(m => {
+                    if (m.tipo === "A quitar" || m.tipo === "Sin") extraInfo.push({ text: `Sin ${m.nombre}`, type: 'remove' });
+                    else extraInfo.push({ text: `${m.nombre}`, type: 'add' });
+                });
+            }
+            if (item.notas && Array.isArray(item.notas)) {
+                item.notas.forEach(nota => {
+                    if (nota.toLowerCase().startsWith('sin ')) extraInfo.push({ text: nota, type: 'remove' });
+                    else extraInfo.push({ text: nota, type: 'add' });
+                });
+            }
         }
 
-        if (item.quitar && item.quitar.length > 0) {
-          item.quitar.forEach((q) => {
-            modsHtml += `<div class="kds-mod remove"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Sin ${q.nombre}</div>`;
-          });
-        }
+        extraInfo.forEach(info => {
+            if (info.type === 'remove') {
+                modsHtml += `<div class="kds-mod remove"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${info.text}</div>`;
+            } else {
+                modsHtml += `<div class="kds-mod add"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${info.text}</div>`;
+            }
+        });
+
+        let isBeverage = item.categoria === 'Bebidas';
+        let itemClass = isBeverage ? 'kds-item kds-item-beverage' : 'kds-item';
 
         bodyHtml += `
-                <div class="kds-item">
-                    <div class="kds-item-main"><span class="kds-item-qty">${item.cantidad}x</span> ${item.nombreBase}</div>
-                    ${modsHtml ? `<div class="kds-mods">${modsHtml}</div>` : ""}
-                </div>`;
+            <div class="${itemClass}">
+                <div class="kds-item-main"><span class="kds-item-qty">${item.cantidad}x</span> ${item.nombreBase || item.nombre}</div>
+                ${modsHtml ? `<div class="kds-mods">${modsHtml}</div>` : ""}
+            </div>`;
       });
     }
 
-    if (v.notas) {
-      bodyHtml += `<div style="margin-top: 15px; padding: 10px; background: rgba(255,152,0,0.1); border-left: 4px solid var(--primary); color: #fff; font-size: 1.1rem;"><strong>Nota:</strong> ${v.notas}</div>`;
+    if (v.notas || v.nota) {
+      bodyHtml += `<div style="margin-top: 15px; padding: 10px; background: rgba(255,152,0,0.1); border-left: 4px solid var(--primary); color: #fff; font-size: 1.1rem;"><strong>Nota Global:</strong> ${v.notas || v.nota}</div>`;
     }
 
-    html += `
-        <div class="kds-card" id="kds-card-${v.id}">
+    let isMine = v.cocineroAsignado === nombreCocinero;
+    let isAssignedToOther = v.estado === "En preparación" && v.cocineroAsignado && v.cocineroAsignado !== nombreCocinero;
+
+    let footerHtml = "";
+    if (v.estado === "Pendiente") {
+        footerHtml = `
+            <button class="kds-btn-take" onclick="window.tomarPedidoKDS('${v.id}')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                Tomar Pedido
+            </button>
+        `;
+    } else if (isMine) {
+        footerHtml = `
+            <button class="kds-btn-ready" onclick="marcarListoKDS('${v.id}')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Marcar como Listo
+            </button>
+            <button class="kds-btn-release" onclick="window.liberarPedidoKDS('${v.id}')">Liberar Pedido</button>
+        `;
+    } else {
+        footerHtml = `
+            <div style="text-align: center; color: #888; font-style: italic; padding: 10px;">Siendo preparado...</div>
+        `;
+    }
+
+    let assigneeBadge = v.cocineroAsignado ? `<div class="kds-assignee-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${v.cocineroAsignado}</div>` : '';
+
+    let cardHtml = `
+        <div class="kds-card ${v.estado === "En preparación" ? "status-preparando" : "status-pendiente"}" id="kds-card-${v.id}">
             <div class="kds-card-header">
                 <h2 class="kds-order-number">${numOrdStr}</h2>
                 <div class="kds-order-time ${delayed ? "delayed" : ""}" data-time="${orderTime.getTime()}">
@@ -84,23 +167,31 @@ window.renderizarKDS = () => {
                     <span class="timer-text">00:00</span>
                 </div>
             </div>
-            <div class="kds-client-name">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                ${v.cliente}
+            <div class="kds-client-name" style="display: flex; justify-content: space-between;">
+                <span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    ${v.cliente || 'Mostrador'}
+                </span>
+                ${assigneeBadge}
             </div>
             <div class="kds-card-body">
                 ${bodyHtml}
             </div>
             <div class="kds-card-footer">
-                <button class="kds-btn-ready" onclick="marcarListoKDS('${v.id}')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Marcar como Listo
-                </button>
+                ${footerHtml}
             </div>
         </div>`;
+
+    if (v.estado === "En preparación") {
+        htmlPreparando += cardHtml;
+    } else {
+        htmlPendientes += cardHtml;
+    }
   });
 
-  container.innerHTML = html;
+  containerPreparando.innerHTML = htmlPreparando || `<div style="grid-column: 1 / -1; text-align: center; color: #777; margin-top: 20px; font-size: 1.2rem;">Ningún pedido en preparación.</div>`;
+  containerPendientes.innerHTML = htmlPendientes || `<div style="grid-column: 1 / -1; text-align: center; color: #777; margin-top: 20px; font-size: 1.2rem;">No hay pedidos pendientes.</div>`;
+
   updateKDSTimers();
 };
 
@@ -111,10 +202,23 @@ window.marcarListoKDS = async (idVenta) => {
     // Let animation finish before removing from DB (visually cleaner)
     setTimeout(async () => {
       try {
-        await updateDoc(doc(db, "ventas", idVenta), {
+        const now = new Date();
+        const v = window.ventasGlobales.find(x => x.id === idVenta);
+
+        let updateData = {
           estado: "Listo",
-          fechaListo: new Date().toISOString(),
-        });
+          fechaListo: now.toISOString(),
+        };
+
+        // Calcular tiempo total si existe horaTomado
+        if (v && v.horaTomado) {
+            const tomado = new Date(v.horaTomado);
+            const diffMs = now.getTime() - tomado.getTime();
+            const diffMin = Math.floor(diffMs / 60000);
+            updateData.tiempoPreparacionMinutos = diffMin;
+        }
+
+        await updateDoc(doc(db, "ventas", idVenta), updateData);
         // Snapshot listener will naturally trigger re-render, but visual feedback is immediate
       } catch (err) {
         console.error("Error marking ready in KDS:", err);
@@ -167,3 +271,37 @@ kdsTimerInterval = setInterval(() => {
     updateKDSTimers();
   }
 }, 1000);
+
+window.tomarPedidoKDS = async (idVenta) => {
+  const nombreCocinero = localStorage.getItem("grub_kds_nombre");
+  if (!nombreCocinero) {
+      alert("Por favor identifícate primero.");
+      return;
+  }
+
+  try {
+      await updateDoc(doc(db, "ventas", idVenta), {
+          estado: "En preparación",
+          cocineroAsignado: nombreCocinero,
+          horaTomado: new Date().toISOString()
+      });
+  } catch (err) {
+      console.error("Error al tomar pedido:", err);
+      alert("Error al tomar el pedido.");
+  }
+};
+
+window.liberarPedidoKDS = async (idVenta) => {
+  if (confirm("¿Estás seguro que deseas liberar este pedido? Volverá a estar pendiente para todos.")) {
+      try {
+          await updateDoc(doc(db, "ventas", idVenta), {
+              estado: "Pendiente",
+              cocineroAsignado: null,
+              horaTomado: null
+          });
+      } catch (err) {
+          console.error("Error al liberar pedido:", err);
+          alert("Error al liberar el pedido.");
+      }
+  }
+};

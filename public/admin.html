@@ -210,6 +210,18 @@
       </button>
     </aside>
 
+    <!-- Modal Login KDS (Identificación de Cocinero) -->
+    <div id="modalLoginKDS" class="modal-overlay" style="display: none; z-index: 10000; background: rgba(0,0,0,0.9);">
+      <div class="modal-box" style="max-width: 400px; text-align: center; background: #1a1a1a; padding: 40px 20px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <h2 style="color: white; margin-bottom: 10px;">Identificación Requerida</h2>
+        <p style="color: #aaa; margin-bottom: 25px; font-size: 0.9em;">Ingresa tu nombre para comenzar a tomar pedidos en la cocina.</p>
+        <input type="text" id="kdsNombreCocinero" placeholder="Tu nombre..." class="input-base" style="font-size: 1.2rem; text-align: center;" onkeypress="if(event.key==='Enter') window.iniciarSesionKDS()">
+        <button class="btn-primary" onclick="window.iniciarSesionKDS()" style="margin-top: 15px; font-size: 1.1rem; padding: 12px;">Entrar a Cocina</button>
+        <button class="btn-secundario" onclick="cerrarSesion()" style="margin-top: 15px; background: transparent; border: 1px solid #444; color: #aaa;">Cerrar sesión de la cuenta</button>
+      </div>
+    </div>
+
     <div id="cocina-screen" style="display: none">
       <div class="kds-header">
         <div class="kds-title">
@@ -227,7 +239,7 @@
               d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
             />
           </svg>
-          <span>Monitor de Cocina (KDS)</span>
+          <span>Monitor de Cocina (KDS) <span id="kdsNombreDisplay" style="font-size: 0.7em; margin-left: 10px; color: #888; background: #222; padding: 4px 10px; border-radius: 15px;"></span></span>
         </div>
 
         <div class="kds-view-switcher">
@@ -294,7 +306,7 @@
           </button>
         </div>
 
-        <button onclick="cerrarSesion()" class="kds-logout-btn">
+        <button onclick="window.cerrarSesionKDS()" class="kds-logout-btn" style="color: #ff9800;">
           <svg
             width="20"
             height="20"
@@ -309,12 +321,30 @@
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          Salir
+          Cambiar Cocinero
         </button>
       </div>
 
-      <div id="kds-container" class="kds-grid view-tablet">
-        <!-- Cards will be injected here via JS -->
+      <!-- Contenedor principal del KDS: Dividido en "En preparación" y "Pendientes" -->
+      <div id="kds-layout" style="display: flex; flex-direction: column; height: calc(100vh - 60px); overflow: hidden; background: #121212;">
+
+        <div style="padding: 15px; border-bottom: 2px solid #222; background: #161616;">
+            <h3 style="color: var(--primary); margin-bottom: 10px; font-size: 1.1em; display: flex; justify-content: space-between;">
+                <span>🔥 En Preparación</span>
+                <span style="color: #888; font-size: 0.8em; font-weight: normal;">(Visión Global)</span>
+            </h3>
+            <div id="kds-preparando-container" class="kds-grid view-tablet" style="margin-bottom: 0;">
+                <!-- Pedidos en preparación -->
+            </div>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; padding: 15px;">
+            <h3 style="color: #aaa; margin-bottom: 15px; font-size: 1em;">📥 Pedidos Pendientes</h3>
+            <div id="kds-pendientes-container" class="kds-grid view-tablet">
+                <!-- Pedidos pendientes -->
+            </div>
+        </div>
+
       </div>
     </div>
 
